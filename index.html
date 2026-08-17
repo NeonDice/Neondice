@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NeonDice Demo</title>
+<style>
+:root{--bg:#080a11;--panel:#111522;--panel2:#171b2b;--line:#282e43;--txt:#f5f7ff;--muted:#929ab1;--a:#667dff;--b:#a34fff;--green:#38d69d}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 75% 0,#35417a55,transparent 35%),#080a11;color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input{font:inherit}
+.app{min-height:100vh;display:grid;grid-template-columns:220px 1fr 300px}.side{padding:22px 14px;border-right:1px solid var(--line);background:#090b12}.logo{font-weight:900;font-size:20px;margin:5px 10px 25px}.logo i{color:var(--b);font-style:normal}.nav button{display:block;width:100%;padding:13px;border:0;border-radius:11px;background:transparent;color:var(--muted);text-align:left;margin:5px 0;cursor:pointer}.nav button.active,.nav button:hover{background:#191d2d;color:#fff}.nav .label{font-size:10px;color:#5d657b;letter-spacing:1.5px;text-transform:uppercase;margin:25px 10px 8px}
+main{padding:24px;max-width:1000px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.tag{background:#151a29;border:1px solid var(--line);padding:8px 11px;border-radius:9px;color:#aeb6ca;font-size:12px}
+.hero{background:linear-gradient(145deg,#171b2d,#10131e);border:1px solid var(--line);border-radius:20px;padding:24px}.hero h1{margin:0 0 7px;font-size:28px}.hero p{color:var(--muted);margin:0 0 18px}.dice{height:250px;border-radius:17px;border:1px solid #303854;background:radial-gradient(circle,#29335e,#151927 62%);display:grid;place-items:center}.cube{width:105px;height:105px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(140deg,#718aff,#7042d8);font-size:40px;font-weight:900;box-shadow:0 25px 70px #6c5fff66}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}.btn{border:0;border-radius:10px;padding:11px 15px;background:#22273a;color:#fff;font-weight:700;cursor:pointer}.primary{background:linear-gradient(135deg,var(--a),var(--b))}.btn:active{transform:scale(.98)}
+.section{margin-top:20px}.section h2{font-size:16px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:14px}.item{display:flex;gap:12px;align-items:center}.icon{width:44px;height:44px;border-radius:11px;background:linear-gradient(140deg,#7085ff,#994cf1);display:grid;place-items:center;font-size:21px}.muted{color:var(--muted)}
+.chat{border-left:1px solid var(--line);background:#090b12;padding:18px;display:flex;flex-direction:column}.chathead{display:flex;justify-content:space-between}.online{color:var(--green);font-size:12px}.messages{flex:1;overflow:auto;margin:14px 0}.msg{padding:8px 0}.msg b{color:#b7c1ff}.msg p{margin:3px 0;color:#d9ddec}.send{display:flex;gap:7px}.send input{min-width:0;flex:1;background:#151a29;color:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;outline:none}
+.modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:18px;z-index:20}.modal.open{display:flex}.box{width:min(650px,100%);max-height:90vh;overflow:auto;background:#111522;border:1px solid #323950;border-radius:18px;padding:20px;box-shadow:0 30px 100px #000}.head{display:flex;align-items:center;justify-content:space-between}.head h2{margin:0}.x{border:0;background:transparent;color:#9aa2b8;font-size:28px;cursor:pointer}.modalgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:15px}.trade{margin-top:15px;padding:18px;border:1px dashed #3a425d;border-radius:13px}.note{font-size:12px;color:#7e879e;line-height:1.5;margin-top:14px}
+@media(max-width:900px){.app{grid-template-columns:80px 1fr}.chat{display:none}.logo{font-size:0}.logo i{font-size:18px}.nav button{font-size:0;text-align:center}.nav button:first-letter{font-size:19px}}
+@media(max-width:650px){.app{display:block}.side{display:none}main{padding:12px}.grid{grid-template-columns:1fr}.hero{padding:17px}.hero h1{font-size:24px}.dice{height:210px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+<div class="logo">NEON<i>DICE</i></div>
+<div class="nav">
+<button class="active" onclick="showHome()">🎲 Dice</button>
+<button onclick="showInventory()">🎒 Inventory</button>
+<button onclick="showTrade()">➕ Add Items</button>
+<div class="label">Community</div>
+<button onclick="alert('Demo: Leaderboard kommt später.')">🏆 Leaderboard</button>
+<button onclick="alert('Demo: Spieler-Liste kommt später.')">👥 Players</button>
+</div>
+</aside>
+
+<main>
+<div class="top"><div><b>Dice</b><div class="muted">Create a game with your items</div></div><div class="tag">DEMO</div></div>
+<section class="hero">
+<h1>Create a Dice Game</h1><p>Wähle Items aus deinem Inventar und erstelle ein Spiel.</p>
+<div class="dice"><div class="cube" id="die">7</div></div>
+<div class="actions">
+<button class="btn primary" onclick="createGame()">Create Game</button>
+<button class="btn" onclick="showInventory()">🎒 Inventory</button>
+<button class="btn" onclick="showTrade()">＋ Add Items</button>
+</div>
+</section>
+<section class="section"><h2>Deine Items <span class="muted" id="count"></span></h2><div class="grid" id="items"></div></section>
+<section class="section"><h2>So funktioniert es</h2><div class="grid">
+<div class="card"><b>1. Items</b><p class="muted">Items werden deinem Inventar hinzugefügt.</p></div>
+<div class="card"><b>2. Create</b><p class="muted">Du erstellst ein Dice-Spiel.</p></div>
+<div class="card"><b>3. Play</b><p class="muted">Ein anderer Spieler kann später beitreten.</p></div>
+</div></section>
+</main>
+
+<aside class="chat">
+<div class="chathead"><b>Global Chat</b><span class="online">● Online</span></div>
+<div class="messages" id="messages">
+<div class="msg"><b>Nova</b><p>Willkommen bei NeonDice 👋</p></div>
+<div class="msg"><b>Pixel</b><p>Hat jemand Lust zu spielen?</p></div>
+</div>
+<div class="send"><input id="chatInput" placeholder="Nachricht..." maxlength="120"><button class="btn primary" onclick="sendMsg()">➤</button></div>
+</aside>
+</div>
+
+<div class="modal" id="modal">
+<div class="box">
+<div class="head"><h2 id="title"></h2><button class="x" onclick="closeModal()">×</button></div>
+<div id="body"></div>
+</div>
+</div>
+
+<script>
+const inventory=[
+["🐱","Huge Cosmic","1250"],["🐉","Titanic Dragon","980"],["🌈","Rainbow Cat","740"],
+["🔥","Golden Phoenix","510"],["🐰","Crystal Bunny","350"],["🦎","Galaxy Axolotl","220"]
+];
+const items=document.getElementById("items");
+document.getElementById("count").textContent="("+inventory.length+")";
+function renderItems(target=items){
+target.innerHTML=inventory.map((x,i)=>`<div class="card"><div class="item"><div class="icon">${x[0]}</div><div><b>${x[1]}</b><div class="muted">${x[2]} value</div></div></div></div>`).join("");
+}
+renderItems();
+
+function openModal(title,body){document.getElementById("title").textContent=title;document.getElementById("body").innerHTML=body;document.getElementById("modal").classList.add("open")}
+function closeModal(){document.getElementById("modal").classList.remove("open")}
+function showInventory(){
+openModal("🎒 Dein Inventory",`<p class="muted">Hier siehst du alle Items, die du für Spiele verwenden kannst.</p><div class="modalgrid" id="modalItems"></div>`);
+renderItems(document.getElementById("modalItems"));
+}
+function showTrade(){
+openModal("➕ Items hinzufügen",`<div class="trade"><h3 style="margin-top:0">Pet Simulator 99 Trade</h3><p class="muted">In der späteren Version würde hier die sichere Trade-Anbindung stehen. Für diese Demo werden keine Roblox-Accounts verbunden und keine Items übertragen.</p><button class="btn primary" onclick="alert('Demo: Trade-System ist noch nicht verbunden.')">Trade Request senden</button></div><div class="note">Das echte Trade-System muss vor dem Einsatz mit den aktuellen Regeln von Roblox und Pet Simulator 99 geprüft werden.</div>`);
+}
+function showHome(){closeModal();window.scrollTo({top:0,behavior:"smooth"})}
+function createGame(){
+const die=document.getElementById("die");let n=0;
+const t=setInterval(()=>{die.textContent=Math.floor(Math.random()*99)+1;n++;if(n>9){clearInterval(t);alert("🎲 Demo-Spiel erstellt!");}},70);
+}
+function sendMsg(){
+const input=document.getElementById("chatInput");const text=input.value.trim();if(!text)return;
+const d=document.createElement("div");d.className="msg";d.innerHTML="<b>You</b><p>"+escapeHtml(text)+"</p>";
+document.getElementById("messages").appendChild(d);input.value="";document.getElementById("messages").scrollTop=999999;
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]))}
+document.getElementById("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter")sendMsg()});
+document.getElementById("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal()});
+</script>
+</body>
+</html>
