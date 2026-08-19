@@ -86,15 +86,36 @@ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>showPage(b.data
 
 async function init(){
   $("connection").textContent="Verbinde…";
-  const {data:{user}}=await db.auth.getUser();
-  if(user){me.id=user.id; await loadProfile();}
-  else{
-    const guest=localStorage.getItem("neondice_guest")||("guest_"+Math.random().toString(36).slice(2,9));
-    localStorage.setItem("neondice_guest",guest); me.id=guest; me.name=localStorage.getItem("neondice_name")||"Gast";
+
+  let {data:{user}, error} = await db.auth.getUser();
+
+  if(!user){
+    const result = await db.auth.signInAnonymously();
+
+    if(result.error){
+      console.error(result.error);
+      $("connection").textContent="Anmeldung fehlgeschlagen";
+      alert("Anonyme Anmeldung ist in Supabase noch nicht aktiviert.");
+      return;
+    }
+
+    user = result.data.user;
   }
+
+  me.id = user.id;
+
+  await loadProfile();
+
+  if(!me.name || me.name==="Gast"){
+    me.name = localStorage.getItem("neondice_name") || "Gast";
+  }
+
   $("userLabel").textContent=me.name;
   $("connection").textContent="Online";
-  await loadGames(); await loadMessages(); subscribe();
+
+  await loadGames();
+  await loadMessages();
+  subscribe();
 }
 
 async function loadProfile(){
