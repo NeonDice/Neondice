@@ -33,33 +33,438 @@
 </main>
 <section class="chat"><h2>💬 Global Chat</h2><div id="messages" class="messages"></div><form id="chatForm" class="chatform"><input id="chatInput" class="input" maxlength="300" placeholder="Nachricht…"><button class="btn">➤</button></form></section>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+/* NeonDice – robuste Frontend-Version
+   Navigation funktioniert auch dann, wenn Supabase gerade nicht erreichbar ist.
+*/
 const SUPABASE_URL="https://dtafhtluycvvisuehphd.supabase.co";
 const SUPABASE_KEY="sb_publishable_l2SONE96HDFKPj9Dd02RgA_e7LIB_j0";
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let me={id:null,name:"Gast"},currentGame=null,channel=null;
+
+let db=null;
+let me={id:null,name:"Gast"};
+let currentGame=null;
+let channel=null;
+
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function showPage(page){["dice","create","inventory","profile"].forEach(p=>$("page-"+p).classList.toggle("hidden",p!==page));document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));$("title").textContent={dice:"Two Dice Battle",create:"Create Game",inventory:"Inventory",profile:"Profile"}[page];if(page==="inventory")loadInventory();if(page==="profile")loadProfile()}
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>showPage(b.dataset.page));
-async function init(){ $("connection").textContent="Verbinde…";let {data:{user}}=await db.auth.getUser();if(!user){const result=await db.auth.signInAnonymously();if(result.error){$("connection").textContent="Anmeldung fehlgeschlagen";alert("Anonyme Anmeldung ist in Supabase noch nicht aktiviert.");return}user=result.data.user}me.id=user.id;await loadProfile();if(!me.name||me.name==="Gast")me.name=localStorage.getItem("neondice_name")||"Gast";$("userLabel").textContent=me.name;$("connection").textContent="Online";await loadGames();await loadMessages();subscribe()}
-async function loadProfile(){if(!me.id)return;const {data}=await db.from("profiles").select("*").eq("id",me.id).maybeSingle();if(data)me.name=data.username||data.display_name||"Gast";$("profileName").textContent=me.name;$("username").value=me.name==="Gast"?"":me.name;$("profileId").textContent="ID: "+String(me.id).slice(0,12)+"…";$("avatar").textContent=(me.name||"G").charAt(0).toUpperCase();$("userLabel").textContent=me.name}
-async function saveProfile(){const name=$("username").value.trim();if(!name){alert("Bitte einen Username eingeben.");return}me.name=name;localStorage.setItem("neondice_name",name);const {error}=await db.from("profiles").upsert({id:me.id,username:name,display_name:name},{onConflict:"id"});if(error){alert("Profil konnte nicht gespeichert werden: "+error.message);return}await loadProfile();alert("Profil gespeichert.")}
-$("saveProfile").onclick=saveProfile;
-async function loadInventory(){const box=$("inventory");box.innerHTML="";const {data,error}=await db.from("inventory").select("*").eq("user_id",me.id).order("created_at",{ascending:false});if(!error&&data?.length){data.forEach(i=>box.insertAdjacentHTML("beforeend",`<div class="item"><strong>📦 ${esc(i.item_name||i.name||"Item")}</strong><span class="small">Menge: ${esc(i.quantity??1)}</span></div>`));return}box.innerHTML=`<div class="item"><strong>🎒 Test Item</strong><span class="small">Demo-Inventar</span></div><div class="item"><strong>💎 Gems</strong><span class="small">0</span></div>`}
-async function loadGames(){const box=$("games");const {data,error}=await db.from("games").select("*").order("created_at",{ascending:false}).limit(30);if(error){box.innerHTML=`<div class="small">Spiele konnten nicht geladen werden: ${esc(error.message)}</div>`;return}if(!data?.length){box.innerHTML='<div class="small">Noch keine offenen Spiele. Erstelle das erste!</div>';return}box.innerHTML="";data.filter(g=>String(g.status||"open")!=="finished").forEach(g=>{const p1=g.player1_name||g.creator_name||"Spieler 1",p2=g.player2_name||"Wartet…";box.insertAdjacentHTML("beforeend",`<div class="card game"><div><h3>🎲 ${esc(g.name||"Two Dice Battle")}</h3><div class="meta">${esc(p1)} VS ${esc(p2)}</div><div class="small">Status: ${esc(g.status||"open")}</div></div><div class="actions">${g.player2_id?`<button class="btn secondary" onclick="viewGame('${g.id}')">Ansehen</button>`:`<button class="btn" onclick="joinGame('${g.id}')">Join</button>`}</div></div>`)})}
-async function createGame(){const name=$("gameName").value.trim()||"Neon Battle";const row={name,creator_id:me.id,creator_name:me.name,player1_id:me.id,player1_name:me.name,status:"open"};const {data,error}=await db.from("games").insert(row).select().single();if(error){alert("Lobby konnte nicht erstellt werden: "+error.message);return}currentGame=data;showPage("dice");renderGame(data);await loadGames()}
-$("createGame").onclick=createGame;
-function rollDice(){return Math.floor(Math.random()*6)+1}
-async function joinGame(id){const {data:game,error:loadError}=await db.from("games").select("*").eq("id",id).single();if(loadError||!game){alert("Spiel konnte nicht geladen werden.");return}if(game.player2_id){alert("Dieses Spiel ist bereits voll.");return}if(game.player1_id===me.id){alert("Du bist bereits der Ersteller dieses Spiels.");return}const p1d1=rollDice(),p1d2=rollDice(),p2d1=rollDice(),p2d2=rollDice();const {data,error}=await db.from("games").update({player2_id:me.id,player2_name:me.name,player1_roll1:p1d1,player1_roll2:p1d2,player2_roll1:p2d1,player2_roll2:p2d2,status:"ready"}).eq("id",id).is("player2_id",null).select().single();if(error){alert("Beitritt fehlgeschlagen: "+error.message);return}currentGame=data;renderGame(data);await loadGames()}
-async function viewGame(id){const {data,error}=await db.from("games").select("*").eq("id",id).single();if(error){alert("Spiel konnte nicht geladen werden.");return}currentGame=data;renderGame(data)}
-function setDie(id,value){const el=$(id);if(value===null||value===undefined){el.textContent="?";el.classList.remove("rolled");return}el.textContent=value;el.classList.add("rolled")}
-function renderGame(g){showPage("dice");$("player1Name").textContent=g.player1_name||g.creator_name||"Ersteller";$("player2Name").textContent=g.player2_name||"Wartet…";$("player1Avatar").textContent=(g.player1_name||g.creator_name||"?").charAt(0).toUpperCase();$("player2Avatar").textContent=g.player2_id?(g.player2_name||"?").charAt(0).toUpperCase():"?";setDie("p1d1",g.player1_roll1);setDie("p1d2",g.player1_roll2);setDie("p2d1",g.player2_roll1);setDie("p2d2",g.player2_roll2");const p1sum=Number(g.player1_roll1||0)+Number(g.player1_roll2||0),p2sum=Number(g.player2_roll1||0)+Number(g.player2_roll2||0);$("p1sum").textContent=p1sum?"Summe: "+p1sum:"–";$("p2sum").textContent=p2sum?"Summe: "+p2sum:"–";if(!g.player2_id){$("result").innerHTML=`<b>${esc(g.player1_name||g.creator_name||"Ersteller")}</b> wartet auf einen Gegner.<br><span class="small">Die Würfel werden automatisch gewürfelt, sobald jemand beitritt.</span>`;return}if(g.player1_roll1&&g.player1_roll2&&g.player2_roll1&&g.player2_roll2){if(p1sum>p2sum)$("result").innerHTML=`🏆 <b>${esc(g.player1_name)}</b> gewinnt!<br><span class="small">${p1sum} zu ${p2sum}</span>`;else if(p2sum>p1sum)$("result").innerHTML=`🏆 <b>${esc(g.player2_name)}</b> gewinnt!<br><span class="small">${p2sum} zu ${p1sum}</span>`;else $("result").innerHTML=`🤝 <b>Unentschieden!</b><br><span class="small">${p1sum} zu ${p2sum}</span>`;return}$("result").innerHTML="🎲 Würfel werden ausgewertet…"}
-async function loadMessages(){const box=$("messages");const {data,error}=await db.from("messages").select("*").order("created_at",{ascending:true}).limit(100);if(error){box.innerHTML='<div class="small">Chat ist noch nicht lesbar. Prüfe die RLS-Policies für messages.</div>';return}box.innerHTML="";(data||[]).forEach(addMessage);box.scrollTop=box.scrollHeight}
-function addMessage(m){$("messages").insertAdjacentHTML("beforeend",`<div class="msg"><b>${esc(m.username||m.user_name||"Gast")}</b><p>${esc(m.content||m.message||"")}</p></div>`);$("messages").scrollTop=$("messages").scrollHeight}
-$("chatForm").onsubmit=async e=>{e.preventDefault();const text=$("chatInput").value.trim();if(!text)return;const {error}=await db.from("messages").insert({user_id:me.id,username:me.name,content:text});if(error)alert("Nachricht konnte nicht gesendet werden: "+error.message);else $("chatInput").value=""}
-function subscribe(){channel=db.channel("neondice-live").on("postgres_changes",{event:"*",schema:"public",table:"messages"},p=>{if(p.eventType==="INSERT")addMessage(p.new)}).on("postgres_changes",{event:"*",schema:"public",table:"games"},async p=>{await loadGames();if(currentGame&&p.new&&p.new.id===currentGame.id){currentGame=p.new;renderGame(p.new)}}).on("postgres_changes",{event:"*",schema:"public",table:"profiles"},()=>loadProfile()).subscribe()}
+
+function showPage(page){
+  ["dice","create","inventory","profile"].forEach(p=>{
+    const el=$("page-"+p);
+    if(el) el.classList.toggle("hidden",p!==page);
+  });
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+  $("title").textContent={dice:"Two Dice Battle",create:"Create Game",inventory:"Inventory",profile:"Profile"}[page]||"NeonDice";
+
+  if(page==="inventory") loadInventory();
+  if(page==="profile") loadProfile();
+}
+
+/* Navigation wird VOR der Supabase-Verbindung aktiviert. */
+document.querySelectorAll("nav button").forEach(b=>{
+  b.addEventListener("click",()=>showPage(b.dataset.page));
+});
+
+function setConnection(text,ok=false){
+  $("connection").textContent=text;
+  const dot=document.querySelector(".dot");
+  if(dot) dot.style.background=ok?"#34d399":"#fb7185";
+}
+
+async function loadSupabase(){
+  if(window.supabase) return true;
+
+  return new Promise(resolve=>{
+    const s=document.createElement("script");
+    s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+    s.onload=()=>resolve(!!window.supabase);
+    s.onerror=()=>resolve(false);
+    document.head.appendChild(s);
+  });
+}
+
+async function init(){
+  setConnection("Verbinde mit Supabase…");
+
+  const loaded=await loadSupabase();
+  if(!loaded){
+    setConnection("Supabase-Bibliothek nicht erreichbar");
+    $("games").innerHTML='<div class="small">Die Oberfläche funktioniert. Die Datenbankverbindung konnte aber nicht geladen werden.</div>';
+    return;
+  }
+
+  try{
+    db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+    /* Nicht endlos auf getUser warten. */
+    const authPromise=db.auth.getUser();
+    const timeout=new Promise(resolve=>setTimeout(()=>resolve({timeout:true}),8000));
+    const auth=await Promise.race([authPromise,timeout]);
+
+    let user=null;
+
+    if(auth && !auth.timeout && auth.data){
+      user=auth.data.user;
+    }
+
+    if(!user){
+      const anonPromise=db.auth.signInAnonymously();
+      const anon=await Promise.race([
+        anonPromise,
+        new Promise(resolve=>setTimeout(()=>resolve({timeout:true}),8000))
+      ]);
+
+      if(!anon || anon.timeout || anon.error){
+        setConnection("Datenbank nicht angemeldet");
+        $("games").innerHTML='<div class="small">Supabase ist erreichbar, aber die Anmeldung fehlt. Aktiviere in Supabase unter Authentication → Sign In / Providers → Anonymous Sign-Ins.</div>';
+        return;
+      }
+      user=anon.data.user;
+    }
+
+    me.id=user.id;
+
+    /* Lokalen Namen zuerst setzen, damit die Oberfläche sofort funktioniert. */
+    me.name=localStorage.getItem("neondice_name")||"Gast";
+    $("userLabel").textContent=me.name;
+
+    await loadProfile();
+
+    setConnection("Online",true);
+    await loadGames();
+    await loadMessages();
+    subscribe();
+
+  }catch(err){
+    console.error("NeonDice init:",err);
+    setConnection("Supabase-Verbindung fehlgeschlagen");
+    $("games").innerHTML=`<div class="small">Verbindung fehlgeschlagen: ${esc(err.message||err)}</div>`;
+  }
+}
+
+async function loadProfile(){
+  if(!db || !me.id){
+    $("profileName").textContent=me.name;
+    $("username").value=me.name==="Gast"?"":me.name;
+    $("avatar").textContent=(me.name||"G").charAt(0).toUpperCase();
+    return;
+  }
+
+  try{
+    /* Nur username abfragen – display_name existiert in deiner Tabelle offenbar nicht. */
+    const {data,error}=await db.from("profiles").select("id,username").eq("id",me.id).maybeSingle();
+
+    if(!error && data && data.username){
+      me.name=data.username;
+      localStorage.setItem("neondice_name",me.name);
+    }
+  }catch(err){
+    console.warn("Profil laden:",err);
+  }
+
+  $("profileName").textContent=me.name;
+  $("username").value=me.name==="Gast"?"":me.name;
+  $("profileId").textContent=me.id?"ID: "+String(me.id).slice(0,12)+"…":"Noch nicht angemeldet";
+  $("avatar").textContent=(me.name||"G").charAt(0).toUpperCase();
+  $("userLabel").textContent=me.name;
+}
+
+async function saveProfile(){
+  const name=$("username").value.trim();
+  if(!name){alert("Bitte einen Username eingeben.");return}
+
+  me.name=name;
+  localStorage.setItem("neondice_name",name);
+  $("profileName").textContent=name;
+  $("avatar").textContent=name.charAt(0).toUpperCase();
+  $("userLabel").textContent=name;
+
+  if(!db || !me.id){
+    alert("Name lokal gespeichert. Für die Cloud muss Supabase verbunden sein.");
+    return;
+  }
+
+  const {error}=await db.from("profiles").upsert(
+    {id:me.id,username:name},
+    {onConflict:"id"}
+  );
+
+  if(error){
+    alert("Profil konnte nicht gespeichert werden: "+error.message);
+    return;
+  }
+
+  alert("Profil gespeichert.");
+}
+$("saveProfile").addEventListener("click",saveProfile);
+
+async function loadInventory(){
+  const box=$("inventory");
+  box.innerHTML='<div class="small">Lade Inventar…</div>';
+
+  if(!db || !me.id){
+    box.innerHTML=`
+      <div class="item"><strong>🎒 Test Item</strong><span class="small">Demo-Inventar</span></div>
+      <div class="item"><strong>💎 Gems</strong><span class="small">0</span></div>`;
+    return;
+  }
+
+  try{
+    const {data,error}=await db.from("inventory").select("*").eq("user_id",me.id).order("created_at",{ascending:false});
+
+    if(!error && data?.length){
+      box.innerHTML="";
+      data.forEach(i=>box.insertAdjacentHTML("beforeend",
+        `<div class="item"><strong>📦 ${esc(i.item_name||i.name||"Item")}</strong><span class="small">Menge: ${esc(i.quantity??1)}</span></div>`
+      ));
+      return;
+    }
+  }catch(err){console.warn("Inventar:",err)}
+
+  box.innerHTML=`
+    <div class="item"><strong>🎒 Test Item</strong><span class="small">Demo-Inventar</span></div>
+    <div class="item"><strong>💎 Gems</strong><span class="small">0</span></div>`;
+}
+
+async function loadGames(){
+  const box=$("games");
+  if(!db){
+    box.innerHTML='<div class="small">Supabase ist noch nicht verbunden.</div>';
+    return;
+  }
+
+  const {data,error}=await db.from("games").select("*").order("created_at",{ascending:false}).limit(30);
+
+  if(error){
+    box.innerHTML=`<div class="small">Spiele konnten nicht geladen werden: ${esc(error.message)}</div>`;
+    return;
+  }
+
+  if(!data?.length){
+    box.innerHTML='<div class="small">Noch keine offenen Spiele. Erstelle das erste!</div>';
+    return;
+  }
+
+  box.innerHTML="";
+  data.filter(g=>String(g.status||"open")!=="finished").forEach(g=>{
+    const p1=g.player1_name||g.creator_name||"Spieler 1";
+    const p2=g.player2_name||"Wartet…";
+    box.insertAdjacentHTML("beforeend",
+      `<div class="card game">
+        <div>
+          <h3>🎲 ${esc(g.name||"Two Dice Battle")}</h3>
+          <div class="meta">${esc(p1)} VS ${esc(p2)}</div>
+          <div class="small">Status: ${esc(g.status||"open")}</div>
+        </div>
+        <div class="actions">
+          ${g.player2_id
+            ? `<button class="btn secondary" onclick="viewGame('${g.id}')">Ansehen</button>`
+            : `<button class="btn" onclick="joinGame('${g.id}')">Join</button>`}
+        </div>
+      </div>`
+    );
+  });
+}
+
+async function createGame(){
+  if(!db || !me.id){
+    alert("Noch keine Supabase-Verbindung. Bitte kurz warten oder Seite neu laden.");
+    return;
+  }
+
+  const name=$("gameName").value.trim()||"Neon Battle";
+  const row={
+    name,
+    creator_id:me.id,
+    creator_name:me.name,
+    player1_id:me.id,
+    player1_name:me.name,
+    status:"open"
+  };
+
+  const {data,error}=await db.from("games").insert(row).select().single();
+
+  if(error){
+    alert("Lobby konnte nicht erstellt werden: "+error.message);
+    return;
+  }
+
+  currentGame=data;
+  showPage("dice");
+  renderGame(data);
+  await loadGames();
+}
+$("createGame").addEventListener("click",createGame);
+
+async function joinGame(id){
+  if(!db || !me.id){alert("Keine Supabase-Verbindung.");return}
+
+  const {data,error}=await db.from("games")
+    .update({player2_id:me.id,player2_name:me.name,status:"ready"})
+    .eq("id",id)
+    .is("player2_id",null)
+    .select()
+    .single();
+
+  if(error){
+    alert("Beitritt fehlgeschlagen: "+error.message);
+    return;
+  }
+
+  currentGame=data;
+  renderGame(data);
+  await loadGames();
+}
+
+async function viewGame(id){
+  if(!db)return;
+  const {data}=await db.from("games").select("*").eq("id",id).single();
+  if(data){currentGame=data;renderGame(data)}
+}
+
+function renderGame(g){
+  showPage("dice");
+
+  const p1=g.player1_name||g.creator_name||"Ersteller";
+  const p2=g.player2_name||"Wartet…";
+
+  $("result").innerHTML=`
+    <b>${esc(p1)}</b> VS <b>${esc(p2)}</b>
+    ${g.player2_id
+      ? `<div class="small" style="margin-top:8px">Beide Spieler sind bereit. Die Würfe starten automatisch.</div>`
+      : `<div class="small" style="margin-top:8px">Warte auf einen Mitspieler…</div>`}`;
+
+  /* Die tatsächlichen automatischen Würfe werden über die Spieldaten synchronisiert. */
+  if(g.player2_id && g.status!=="finished"){
+    setTimeout(()=>autoRollGame(g),300);
+  }
+}
+
+async function autoRollGame(g){
+  if(!db || !g?.player2_id)return;
+
+  /* Nur der Ersteller startet den Testwurf, damit nicht beide Geräte gleichzeitig würfeln. */
+  if(g.player1_id!==me.id)return;
+
+  const a1=1+Math.floor(Math.random()*6);
+  const a2=1+Math.floor(Math.random()*6);
+  const b1=1+Math.floor(Math.random()*6);
+  const b2=1+Math.floor(Math.random()*6);
+
+  const creatorTotal=a1+a2;
+  const joinerTotal=b1+b2;
+  const winner=creatorTotal===joinerTotal?"draw":(creatorTotal>joinerTotal?"creator":"joiner");
+
+  /* Diese Felder müssen in games vorhanden sein. Falls deine Tabelle sie noch nicht hat,
+     zeigt Supabase eine klare Fehlermeldung an. */
+  const {data,error}=await db.from("games").update({
+    creator_die_1:a1,
+    creator_die_2:a2,
+    player2_die_1:b1,
+    player2_die_2:b2,
+    creator_total:creatorTotal,
+    player2_total:joinerTotal,
+    winner,
+    status:"finished"
+  }).eq("id",g.id).eq("status","ready").select().single();
+
+  if(error){
+    console.error("Auto-Wurf:",error);
+    $("result").innerHTML=`<span class="small">Spiel verbunden. Für den automatischen Wurf fehlen noch die Wurffelder in games.</span>`;
+    return;
+  }
+
+  currentGame=data;
+  renderFinishedGame(data);
+}
+
+function renderFinishedGame(g){
+  const c1=g.creator_die_1??"?";
+  const c2=g.creator_die_2??"?";
+  const j1=g.player2_die_1??"?";
+  const j2=g.player2_die_2??"?";
+  const ct=g.creator_total??"-";
+  const jt=g.player2_total??"-";
+
+  $("diceDisplay").innerHTML=`
+    <div style="font-size:22px;font-weight:900">
+      ${esc(g.player1_name||"Ersteller")} ${c1} + ${c2} = ${ct}
+      &nbsp; VS &nbsp;
+      ${esc(g.player2_name||"Beitritt")} ${j1} + ${j2} = ${jt}
+    </div>`;
+
+  let winner="Unentschieden";
+  if(g.winner==="creator")winner=(g.player1_name||"Ersteller")+" gewinnt!";
+  if(g.winner==="joiner")winner=(g.player2_name||"Beitritt")+" gewinnt!";
+
+  $("result").innerHTML=`<b>${esc(winner)}</b>`;
+}
+
+async function loadMessages(){
+  if(!db)return;
+  const box=$("messages");
+  const {data,error}=await db.from("messages").select("*").order("created_at",{ascending:true}).limit(100);
+
+  if(error){
+    box.innerHTML='<div class="small">Chat ist noch nicht lesbar. Prüfe die RLS-Policies für messages.</div>';
+    return;
+  }
+
+  box.innerHTML="";
+  (data||[]).forEach(addMessage);
+  box.scrollTop=box.scrollHeight;
+}
+
+function addMessage(m){
+  const box=$("messages");
+  box.insertAdjacentHTML("beforeend",
+    `<div class="msg"><b>${esc(m.username||m.user_name||"Gast")}</b><p>${esc(m.content||m.message||"")}</p></div>`
+  );
+  box.scrollTop=box.scrollHeight;
+}
+
+$("chatForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const text=$("chatInput").value.trim();
+  if(!text)return;
+
+  if(!db || !me.id){
+    alert("Keine Supabase-Verbindung.");
+    return;
+  }
+
+  const {error}=await db.from("messages").insert({
+    user_id:me.id,
+    username:me.name,
+    content:text
+  });
+
+  if(error)alert("Nachricht konnte nicht gesendet werden: "+error.message);
+  else $("chatInput").value="";
+});
+
+function subscribe(){
+  if(!db)return;
+
+  channel=db.channel("neondice-live")
+    .on("postgres_changes",{event:"*",schema:"public",table:"messages"},payload=>{
+      if(payload.eventType==="INSERT")addMessage(payload.new);
+    })
+    .on("postgres_changes",{event:"*",schema:"public",table:"games"},async payload=>{
+      await loadGames();
+
+      if(currentGame && payload.new?.id===currentGame.id){
+        currentGame=payload.new;
+        if(payload.new.status==="finished")renderFinishedGame(payload.new);
+        else renderGame(payload.new);
+      }
+    })
+    .on("postgres_changes",{event:"*",schema:"public",table:"profiles"},()=>loadProfile())
+    .subscribe();
+}
+
+/* Seite sofort benutzbar machen, Backend danach verbinden. */
+showPage("dice");
 init();
 </script>
 </body>
