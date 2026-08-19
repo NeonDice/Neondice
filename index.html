@@ -9,7 +9,9 @@
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#34205b 0,#10101d 34%,var(--bg) 65%);color:var(--text);font-family:Inter,system-ui,sans-serif;min-height:100vh}
 button,input{font:inherit}button{border:0;color:white;cursor:pointer}.app{display:grid;grid-template-columns:220px minmax(0,1fr) 310px;min-height:100vh}
 aside{padding:28px 18px;border-right:1px solid #24243a;background:#080a13}.logo{font-weight:900;font-size:24px;margin:4px 14px 34px}.logo span{color:var(--purple2)}nav{display:grid;gap:10px}nav button{background:#111323;border:1px solid transparent;border-radius:12px;text-align:left;padding:13px 15px}nav button.active,nav button:hover{background:#1b1930;border-color:#46317b}.content{padding:34px;max-width:1100px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.status{font-size:13px;color:var(--muted)}.dot{display:inline-block;width:9px;height:9px;background:var(--good);border-radius:50%;margin-right:6px}.card{background:linear-gradient(145deg,#141628,#0e101d);border:1px solid var(--line);border-radius:20px;padding:22px;margin-bottom:18px;box-shadow:0 12px 40px #0004}.hero{min-height:350px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}.btn{background:linear-gradient(135deg,#8b5cf6,#6d43d8);padding:12px 18px;border-radius:12px;font-weight:800}.btn.secondary{background:#1b1a2d;border:1px solid #3a315f}.actions{display:flex;gap:10px;flex-wrap:wrap}.games{display:grid;gap:14px}.game{display:grid;grid-template-columns:1fr auto;gap:15px;align-items:center}.game h3{margin:0 0 6px}.meta{color:var(--muted);font-size:13px}.chat{border-left:1px solid #24243a;background:#090b14;padding:24px;display:flex;flex-direction:column}.chat h2{margin-top:0}.messages{flex:1;overflow:auto;min-height:300px;max-height:calc(100vh - 170px);display:flex;flex-direction:column;gap:9px}.msg{background:#131528;border:1px solid #242542;border-radius:12px;padding:9px 11px}.msg b{color:#c4a7ff;font-size:12px}.msg p{margin:4px 0 0;word-break:break-word}.chatform{display:flex;gap:7px;margin-top:12px}.input{width:100%;background:#0e101d;border:1px solid #302c50;color:white;border-radius:11px;padding:12px;outline:none}.profile{display:flex;gap:15px;align-items:center}.avatar{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#8b5cf6,#f0abfc);font-size:25px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px}.item{padding:18px;border-radius:16px;background:#111323;border:1px solid #292546}.item strong{display:block;font-size:18px;margin-bottom:6px}.hidden{display:none}.notice{padding:12px;border-radius:12px;background:#241a38;border:1px solid #49326d;color:#d9ccf5;margin-bottom:14px}.small{font-size:12px;color:var(--muted)}
-.battle{width:100%;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;margin-top:30px}.player-side{display:flex;flex-direction:column;align-items:center;min-width:0}.battle-avatar{width:58px;height:58px;margin-bottom:10px}.player-name{font-weight:800;font-size:16px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dice-row{display:flex;gap:10px;margin-top:16px}.small-die{width:58px;height:58px;display:grid;place-items:center;border-radius:14px;background:#17132a;border:2px solid #7044c9;color:white;font-size:28px;font-weight:900}.small-die.rolled{background:linear-gradient(135deg,#8b5cf6,#6335d2);border-color:#b084ff}.sum{margin-top:9px;font-weight:800;color:#c4a7ff}.vs{font-size:18px;font-weight:900;color:#c084fc}.winner{margin-top:18px;padding:12px 18px;border-radius:14px;background:#1d1830;border:1px solid #6540a9;font-weight:900;font-size:18px}.countdown{margin-top:10px;color:var(--muted);font-size:12px}
+.battle{width:100%;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;margin-top:30px}.player-side{display:flex;flex-direction:column;align-items:center;min-width:0}.battle-avatar{width:58px;height:58px;margin-bottom:10px}.player-name{font-weight:800;font-size:16px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dice-row{display:flex;gap:10px;margin-top:16px}.small-die{width:58px;height:58px;display:grid;place-items:center;border-radius:14px;background:#17132a;border:2px solid #7044c9;color:white;font-size:28px;font-weight:900}.small-die.rolling{animation:dicePulse .16s infinite alternate}.small-die.rolled{background:linear-gradient(135deg,#8b5cf6,#6335d2);border-color:#b084ff}.sum{margin-top:9px;font-weight:800;color:#c4a7ff}.vs{font-size:18px;font-weight:900;color:#c084fc}.winner{margin-top:18px;padding:12px 18px;border-radius:14px;background:#1d1830;border:1px solid #6540a9;font-weight:900;font-size:18px}.countdown{margin-top:10px;color:var(--muted);font-size:12px}
+.balance{font-weight:900;color:#c4a7ff}.history{display:grid;gap:10px;margin-top:15px}.history-item{padding:13px;border:1px solid #292546;border-radius:13px;background:#111323}.win{color:var(--good)}.loss{color:var(--danger)}
+@keyframes dicePulse{from{transform:rotate(-5deg) scale(.96)}to{transform:rotate(5deg) scale(1.04)}}
 @media(max-width:1050px){.app{grid-template-columns:190px minmax(0,1fr)}.chat{display:none}}@media(max-width:700px){.app{display:block}aside{position:sticky;top:0;z-index:10;border-right:0;border-bottom:1px solid #24243a;padding:10px}nav{grid-template-columns:repeat(4,1fr)}nav button{font-size:12px;text-align:center;padding:10px 5px}.logo{margin:5px;text-align:center;font-size:19px}.content{padding:15px}.top h1{font-size:22px}.hero{min-height:290px}.game{grid-template-columns:1fr}.battle{gap:7px}.small-die{width:48px;height:48px;font-size:23px}.player-name{max-width:105px;font-size:14px}.vs{font-size:15px}}
 </style>
 </head>
@@ -20,9 +22,11 @@ aside{padding:28px 18px;border-right:1px solid #24243a;background:#080a13}.logo{
 </nav></aside>
 <main class="content">
 <div class="top"><div><h1 id="title">Two Dice Battle</h1><div class="status"><span class="dot"></span><span id="connection">Verbinde mit Supabase…</span></div></div><div id="userLabel" class="small"></div></div>
+
 <section id="page-dice">
 <div class="card hero">
-<div class="small">Zwei Spieler · zwei Würfel von 1–6 · höhere Summe gewinnt</div>
+<div class="small">Spielpunkte · Einsatz 95–110% · Gewinner bekommt den Gewinn abzüglich 5% Owner-Anteil</div>
+<div id="balanceTop" class="balance" style="margin-top:8px">Spielpunkte: –</div>
 <div class="battle">
 <div class="player-side"><div class="avatar battle-avatar" id="player1Avatar">?</div><div class="player-name" id="player1Name">Ersteller</div><div class="dice-row"><div class="small-die" id="p1d1">?</div><div class="small-die" id="p1d2">?</div></div><div class="sum" id="p1sum">–</div></div>
 <div class="vs">VS</div>
@@ -32,10 +36,19 @@ aside{padding:28px 18px;border-right:1px solid #24243a;background:#080a13}.logo{
 </div>
 <div class="card"><h2>Offene Spiele</h2><div id="games" class="games"><div class="small">Lade Spiele…</div></div></div>
 </section>
-<section id="page-create" class="hidden"><div class="card"><h2>Spiel erstellen</h2><p class="meta">Erstelle eine kostenlose Two-Dice-Lobby.</p><input id="gameName" class="input" placeholder="Lobby-Name" maxlength="40"><div class="actions" style="margin-top:12px"><button class="btn" id="createGame">Lobby erstellen</button></div></div></section>
+
+<section id="page-create" class="hidden"><div class="card"><h2>Spiel erstellen</h2><p class="meta">Du brauchst genügend Spielpunkte. Andere Spieler dürfen nur mit 95–110% deines Einsatzes beitreten.</p><div id="createBalance" class="balance" style="margin-bottom:12px">Spielpunkte: –</div><input id="gameName" class="input" placeholder="Lobby-Name" maxlength="40"><input id="stake" class="input" type="number" min="1" step="1" placeholder="Einsatz in Spielpunkten" style="margin-top:10px"><div class="actions" style="margin-top:12px"><button class="btn" id="createGame">Lobby erstellen</button></div></div></section>
+
 <section id="page-inventory" class="hidden"><div class="card"><h2>Inventory</h2><div class="notice">Dein Inventar wird aus Supabase geladen.</div><div id="inventory" class="grid"></div></div></section>
-<section id="page-profile" class="hidden"><div class="card"><h2>Profil</h2><div class="profile"><div id="avatar" class="avatar">N</div><div><h2 id="profileName" style="margin:0">Spieler</h2><div id="profileId" class="small"></div></div></div><hr style="border-color:#25243b;border-width:1px 0 0;margin:20px 0"><input id="username" class="input" maxlength="24" placeholder="Username"><div class="actions" style="margin-top:12px"><button class="btn" id="saveProfile">Profil speichern</button></div></div></section>
+
+<section id="page-profile" class="hidden">
+<div class="card"><h2>Profil</h2><div class="profile"><div id="avatar" class="avatar">N</div><div><h2 id="profileName" style="margin:0">Spieler</h2><div id="profileId" class="small"></div><div id="profileBalance" class="balance" style="margin-top:5px">Spielpunkte: –</div></div></div>
+<hr style="border-color:#25243b;border-width:1px 0 0;margin:20px 0">
+<input id="username" class="input" maxlength="24" placeholder="Username"><div class="actions" style="margin-top:12px"><button class="btn" id="saveProfile">Profil speichern</button></div>
+<h2 style="margin-top:28px">Gespielte Spiele</h2><div id="history" class="history"><div class="small">Lade Verlauf…</div></div>
+</div></section>
 </main>
+
 <section class="chat"><h2>💬 Global Chat</h2><div id="messages" class="messages"></div><form id="chatForm" class="chatform"><input id="chatInput" class="input" maxlength="300" placeholder="Nachricht…"><button class="btn">➤</button></form></section>
 </div>
 
@@ -45,10 +58,11 @@ const SUPABASE_URL="https://dtafhtluycvvisuehphd.supabase.co";
 const SUPABASE_KEY="sb_publishable_l2SONE96HDFKPj9Dd02RgA_e7LIB_j0";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let me={id:null,name:"Gast"};
+let me={id:null,name:"Gast",points:0};
 let currentGame=null;
 let channel=null;
 let countdownTimer=null;
+let rolling=false;
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -58,7 +72,7 @@ function showPage(page){
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
   $("title").textContent={dice:"Two Dice Battle",create:"Create Game",inventory:"Inventory",profile:"Profile"}[page];
   if(page==="inventory")loadInventory();
-  if(page==="profile")loadProfile();
+  if(page==="profile"){loadProfile();loadHistory();}
 }
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>showPage(b.dataset.page));
 
@@ -68,25 +82,29 @@ function setConnection(text,ok=false){
   if(dot)dot.style.background=ok?"#34d399":"#fb7185";
 }
 
+function updateBalanceUI(){
+  const text=`Spielpunkte: ${Math.floor(me.points||0)}`;
+  $("balanceTop").textContent=text;
+  $("createBalance").textContent=text;
+  $("profileBalance").textContent=text;
+}
+
 async function init(){
   setConnection("Verbinde mit Supabase…");
-
   try{
     const {data:{user}}=await db.auth.getUser();
-    if(user){
-      me.id=user.id;
-    }else{
+    if(user)me.id=user.id;
+    else{
       const {data,error}=await db.auth.signInAnonymously();
       if(error)throw error;
       me.id=data.user.id;
     }
-
     me.name=localStorage.getItem("neondice_name")||"Gast";
     await loadProfile();
-
-    $("userLabel").textContent=me.name;
+    await loadPoints();
+    updateBalanceUI();
     setConnection("Online",true);
-
+    await cleanupOldGames();
     await loadGames();
     await loadMessages();
     subscribe();
@@ -100,18 +118,27 @@ async function init(){
 async function loadProfile(){
   if(!me.id)return;
   try{
-    const {data}=await db.from("profiles").select("id,username").eq("id",me.id).maybeSingle();
-    if(data?.username){
-      me.name=data.username;
-      localStorage.setItem("neondice_name",me.name);
+    const {data}=await db.from("profiles").select("*").eq("id",me.id).maybeSingle();
+    if(data){
+      if(data.username){me.name=data.username;localStorage.setItem("neondice_name",me.name);}
+      if(data.game_points!=null)me.points=Number(data.game_points)||0;
+      else if(data.points!=null)me.points=Number(data.points)||0;
     }
   }catch(e){console.warn(e)}
-
   $("profileName").textContent=me.name;
   $("username").value=me.name==="Gast"?"":me.name;
   $("profileId").textContent="ID: "+String(me.id).slice(0,12)+"…";
   $("avatar").textContent=(me.name||"G").charAt(0).toUpperCase();
   $("userLabel").textContent=me.name;
+  updateBalanceUI();
+}
+
+async function loadPoints(){
+  try{
+    const {data,error}=await db.from("profiles").select("game_points,points").eq("id",me.id).maybeSingle();
+    if(!error&&data)me.points=Number(data.game_points??data.points??0)||0;
+  }catch(e){console.warn(e)}
+  updateBalanceUI();
 }
 
 async function saveProfile(){
@@ -119,369 +146,261 @@ async function saveProfile(){
   if(!name){alert("Bitte einen Username eingeben.");return}
   me.name=name;
   localStorage.setItem("neondice_name",name);
-
   const {error}=await db.from("profiles").upsert({id:me.id,username:name},{onConflict:"id"});
   if(error){alert("Profil konnte nicht gespeichert werden: "+error.message);return}
-
   await loadProfile();
   alert("Profil gespeichert.");
 }
 $("saveProfile").onclick=saveProfile;
 
+async function loadHistory(){
+  const box=$("history");
+  const {data,error}=await db.from("games").select("*").or(`player1_id.eq.${me.id},player2_id.eq.${me.id}`).eq("status","finished").order("created_at",{ascending:false}).limit(50);
+  if(error){box.innerHTML=`<div class="small">Spielverlauf konnte nicht geladen werden: ${esc(error.message)}</div>`;return}
+  if(!data?.length){box.innerHTML='<div class="small">Du hast noch keine Spiele gespielt.</div>';return}
+  box.innerHTML="";
+  data.forEach(g=>{
+    const isP1=g.player1_id===me.id;
+    const myTotal=isP1?g.creator_total:g.player2_total;
+    const otherTotal=isP1?g.player2_total:g.creator_total;
+    const won=(g.winner==="creator"&&isP1)||(g.winner==="joiner"&&!isP1);
+    const draw=g.winner==="draw";
+    const cls=draw?"":won?"win":"loss";
+    const label=draw?"Unentschieden":won?"Gewonnen":"Verloren";
+    box.insertAdjacentHTML("beforeend",`<div class="history-item"><b>${esc(g.name||"Two Dice Battle")}</b><div class="${cls}" style="margin-top:5px">${label} · ${myTotal??"-"} : ${otherTotal??"-"}</div><div class="small">${esc(g.player1_name||"Spieler")} vs ${esc(g.player2_name||"Spieler")}</div></div>`);
+  });
+}
+
 async function loadInventory(){
   const box=$("inventory");
   box.innerHTML='<div class="small">Lade Inventar…</div>';
-
   const {data,error}=await db.from("inventory").select("*").eq("user_id",me.id).order("created_at",{ascending:false});
-
   if(!error&&data?.length){
     box.innerHTML="";
-    data.forEach(i=>box.insertAdjacentHTML("beforeend",
-      `<div class="item"><strong>📦 ${esc(i.item_name||i.name||"Item")}</strong><span class="small">Menge: ${esc(i.quantity??1)}</span></div>`
-    ));
+    data.forEach(i=>box.insertAdjacentHTML("beforeend",`<div class="item"><strong>📦 ${esc(i.item_name||i.name||"Item")}</strong><span class="small">Menge: ${esc(i.quantity??1)}</span></div>`));
     return;
   }
-
-  box.innerHTML=`
-    <div class="item"><strong>🎒 Test Item</strong><span class="small">Demo-Inventar</span></div>
-    <div class="item"><strong>💎 Gems</strong><span class="small">0</span></div>`;
+  box.innerHTML='<div class="item"><strong>🎒 Kein Item</strong><span class="small">Dein Inventar ist leer.</span></div>';
 }
 
 function gameIsExpired(g){
-  if(!g.player2_id)return false;
-  if(!g.joined_at)return false;
+  if(!g.player2_id||!g.joined_at)return false;
   return Date.now()-new Date(g.joined_at).getTime()>=30000;
+}
+
+async function cleanupOldGames(){
+  /* Alte Spiele werden aus der offenen Lobby-Liste entfernt. */
+  const cutoff=new Date(Date.now()-24*60*60*1000).toISOString();
+  try{
+    await db.from("games").delete().lt("created_at",cutoff);
+    await db.from("games").delete().eq("status","finished");
+  }catch(e){console.warn("Cleanup:",e)}
 }
 
 async function loadGames(){
   const box=$("games");
   const {data,error}=await db.from("games").select("*").order("created_at",{ascending:false}).limit(50);
-
-  if(error){
-    box.innerHTML=`<div class="small">Spiele konnten nicht geladen werden: ${esc(error.message)}</div>`;
-    return;
-  }
-
-  const openGames=(data||[]).filter(g=>{
-    if(String(g.status||"open")==="finished")return false;
-    if(gameIsExpired(g))return false;
-    return true;
-  });
-
-  if(!openGames.length){
-    box.innerHTML='<div class="small">Noch keine offenen Spiele. Erstelle das erste!</div>';
-    return;
-  }
-
+  if(error){box.innerHTML=`<div class="small">Spiele konnten nicht geladen werden: ${esc(error.message)}</div>`;return}
+  const openGames=(data||[]).filter(g=>String(g.status||"open")!=="finished"&&!gameIsExpired(g));
+  if(!openGames.length){box.innerHTML='<div class="small">Noch keine offenen Spiele. Erstelle das erste!</div>';return}
   box.innerHTML="";
   openGames.forEach(g=>{
-    const p1=g.player1_name||g.creator_name||"Spieler 1";
-    const p2=g.player2_name||"Wartet…";
-
-    box.insertAdjacentHTML("beforeend",
-      `<div class="card game">
-        <div>
-          <h3>🎲 ${esc(g.name||"Two Dice Battle")}</h3>
-          <div class="meta">${esc(p1)} VS ${esc(p2)}</div>
-          <div class="small">Status: ${esc(g.status||"open")}</div>
-        </div>
-        <div class="actions">
-          ${g.player2_id
-            ? `<button class="btn secondary" onclick="viewGame('${g.id}')">Ansehen</button>`
-            : `<button class="btn" onclick="joinGame('${g.id}')">Join</button>`}
-        </div>
-      </div>`
-    );
+    const stake=Number(g.stake||0);
+    const min=Math.ceil(stake*.95),max=Math.floor(stake*1.10);
+    box.insertAdjacentHTML("beforeend",`<div class="card game">
+      <div><h3>🎲 ${esc(g.name||"Two Dice Battle")}</h3><div class="meta">${esc(g.player1_name||g.creator_name||"Spieler 1")} · Einsatz <b>${stake}</b> Punkte</div><div class="small">Join: ${min}–${max} Punkte · Status: ${esc(g.status||"open")}</div></div>
+      <div class="actions">${g.player2_id?`<button class="btn secondary" onclick="viewGame('${g.id}')">Ansehen</button>`:`<button class="btn" onclick="joinGame('${g.id}')">Join</button>`}</div>
+    </div>`);
   });
 }
 
 async function createGame(){
   const name=$("gameName").value.trim()||"Neon Battle";
+  const stake=Math.floor(Number($("stake").value));
+  if(!Number.isFinite(stake)||stake<1){alert("Bitte einen gültigen Einsatz eingeben.");return}
+  await loadPoints();
+  if(me.points<stake){alert(`Du hast nur ${Math.floor(me.points)} Spielpunkte. Für ${stake} Punkte reicht dein Guthaben nicht.`);return}
 
-  const row={
-    name,
-    creator_id:me.id,
-    creator_name:me.name,
-    player1_id:me.id,
-    player1_name:me.name,
-    status:"open",
-    player1_die1:null,
-    player1_die2:null,
-    player2_die1:null,
-    player2_die2:null,
-    creator_total:null,
-    player2_total:null,
-    winner:null,
-    joined_at:null
-  };
+  const row={name,creator_id:me.id,creator_name:me.name,player1_id:me.id,player1_name:me.name,stake,status:"open",
+    player1_die1:null,player1_die2:null,player2_die1:null,player2_die2:null,creator_total:null,player2_total:null,winner:null,joined_at:null,
+    owner_fee:0,pot:0,payout:0};
 
   const {data,error}=await db.from("games").insert(row).select().single();
-
-  if(error){
-    alert("Lobby konnte nicht erstellt werden: "+error.message);
-    return;
-  }
-
-  currentGame=data;
-  resetBattle();
-  showPage("dice");
-  renderGame(data);
-  await loadGames();
+  if(error){alert("Lobby konnte nicht erstellt werden: "+error.message);return}
+  currentGame=data;resetBattle();showPage("dice");renderGame(data);await loadGames();
 }
+
 $("createGame").onclick=createGame;
 
 async function joinGame(id){
-  const joinedAt=new Date().toISOString();
-
-  /*
-   * Nur der erste Beitritt darf gewinnen.
-   * Die Würfel werden hier NICHT lokal erzeugt.
-   * Der Ersteller erzeugt sie nach dem Join und speichert sie in Supabase.
-   */
-  const {data,error}=await db.from("games")
-    .update({
-      player2_id:me.id,
-      player2_name:me.name,
-      status:"ready",
-      joined_at:joinedAt
-    })
-    .eq("id",id)
-    .is("player2_id",null)
-    .select()
-    .single();
-
-  if(error){
-    alert("Beitritt fehlgeschlagen: "+error.message);
+  if(rolling)return;
+  await loadPoints();
+  const {data:g,error:getErr}=await db.from("games").select("*").eq("id",id).single();
+  if(getErr){alert("Spiel konnte nicht geladen werden: "+getErr.message);return}
+  if(g.player2_id){alert("Dieses Spiel hat bereits einen Mitspieler.");return}
+  const stake=Number(g.stake||0);
+  const min=Math.ceil(stake*.95),max=Math.floor(stake*1.10);
+  if(me.points<min||me.points>max){
+    alert(`Du kannst nicht beitreten. Der Einsatz des Erstellers beträgt ${stake} Punkte. Du brauchst zwischen ${min} und ${max} Spielpunkten.`);
     return;
   }
 
-  currentGame=data;
-  renderGame(data);
-  await loadGames();
+  const joinedAt=new Date().toISOString();
+  const {data,error}=await db.from("games").update({player2_id:me.id,player2_name:me.name,status:"ready",joined_at:joinedAt}).eq("id",id).is("player2_id",null).select().single();
+  if(error){alert("Beitritt fehlgeschlagen: "+error.message);return}
 
-  /*
-   * Falls der Beitretende zufällig das Event schneller erhält:
-   * Er würfelt NICHT. Nur player1_id darf den Wurf durchführen.
-   */
-  if(data.player1_id===me.id){
-    setTimeout(()=>autoRollGame(data),500);
-  }
+  currentGame=data;renderGame(data);await loadGames();
+  if(data.player1_id===me.id)setTimeout(()=>autoRollGame(data),650);
 }
 
 async function viewGame(id){
   const {data,error}=await db.from("games").select("*").eq("id",id).single();
   if(error){alert("Spiel konnte nicht geladen werden: "+error.message);return}
-  currentGame=data;
-  renderGame(data);
-
+  currentGame=data;renderGame(data);
   if(data.status==="finished")renderFinishedGame(data);
 }
 
 function resetBattle(){
-  $("player1Name").textContent="Ersteller";
-  $("player2Name").textContent="Wartet…";
-  $("player1Avatar").textContent="?";
-  $("player2Avatar").textContent="?";
-  ["p1d1","p1d2","p2d1","p2d2"].forEach(id=>{
-    $(id).textContent="?";
-    $(id).classList.remove("rolled");
-  });
-  $("p1sum").textContent="–";
-  $("p2sum").textContent="–";
-  $("result").innerHTML="Wähle eine Lobby oder erstelle eine neue.";
+  ["p1d1","p1d2","p2d1","p2d2"].forEach(id=>{$(id).textContent="?";$(id).classList.remove("rolled","rolling")});
+  $("player1Name").textContent="Ersteller";$("player2Name").textContent="Wartet…";
+  $("player1Avatar").textContent="?";$("player2Avatar").textContent="?";
+  $("p1sum").textContent="–";$("p2sum").textContent="–";$("result").innerHTML="Wähle eine Lobby oder erstelle eine neue.";
   if(countdownTimer)clearInterval(countdownTimer);
 }
 
 function renderGame(g){
   showPage("dice");
-
   $("player1Name").textContent=g.player1_name||g.creator_name||"Ersteller";
   $("player2Name").textContent=g.player2_name||"Wartet…";
-
   $("player1Avatar").textContent=(g.player1_name||g.creator_name||"E").charAt(0).toUpperCase();
-  $("player2Avatar").textContent=g.player2_name?(g.player2_name.charAt(0).toUpperCase()):"?";
-
-  setDie("p1d1",g.player1_die1);
-  setDie("p1d2",g.player1_die2);
-  setDie("p2d1",g.player2_die1);
-  setDie("p2d2",g.player2_die2);
-
+  $("player2Avatar").textContent=g.player2_name?g.player2_name.charAt(0).toUpperCase():"?";
+  setDie("p1d1",g.player1_die1);setDie("p1d2",g.player1_die2);setDie("p2d1",g.player2_die1);setDie("p2d2",g.player2_die2);
   $("p1sum").textContent=g.creator_total!=null?"Summe: "+g.creator_total:"–";
   $("p2sum").textContent=g.player2_total!=null?"Summe: "+g.player2_total:"–";
-
-  if(g.status==="finished"){
-    renderFinishedGame(g);
-    return;
-  }
-
+  if(g.status==="finished"){renderFinishedGame(g);return}
   if(g.player2_id){
-    $("result").innerHTML=`<b>${esc(g.player1_name||"Ersteller")}</b> VS <b>${esc(g.player2_name||"Beitritt")}</b><div class="small" style="margin-top:8px">Spieler beigetreten. Würfel werden automatisch geworfen…</div>`;
+    $("result").innerHTML=`<b>${esc(g.player1_name||"Ersteller")}</b> VS <b>${esc(g.player2_name||"Mitspieler")}</b><div class="small" style="margin-top:8px">Spieler beigetreten. Würfel werden automatisch geworfen…</div>`;
     startCountdown(g);
   }else{
-    $("result").innerHTML=`<b>${esc(g.player1_name||"Ersteller")}</b> wartet auf einen Mitspieler.<div class="small" style="margin-top:8px">Die Würfel bleiben auf ? bis jemand beitritt.</div>`;
+    const stake=Number(g.stake||0),min=Math.ceil(stake*.95),max=Math.floor(stake*1.10);
+    $("result").innerHTML=`<b>${esc(g.player1_name||"Ersteller")}</b> wartet auf einen Mitspieler.<div class="small" style="margin-top:8px">Einsatz: ${stake} Punkte · Join erlaubt: ${min}–${max} Punkte.</div>`;
   }
 }
 
 function setDie(id,value){
   const el=$(id);
-  if(value==null){
-    el.textContent="?";
-    el.classList.remove("rolled");
-  }else{
-    el.textContent=value;
-    el.classList.add("rolled");
-  }
+  if(value==null){el.textContent="?";el.classList.remove("rolled","rolling")}
+  else{el.textContent=value;el.classList.remove("rolling");el.classList.add("rolled")}
 }
 
 function startCountdown(g){
   if(countdownTimer)clearInterval(countdownTimer);
   if(!g.joined_at)return;
-
   const end=new Date(g.joined_at).getTime()+30000;
-
   const tick=()=>{
     const left=Math.max(0,Math.ceil((end-Date.now())/1000));
     const countdown=document.getElementById("battleCountdown");
-
-    if(left<=0){
-      if(countdown)countdown.textContent="Lobby aus der offenen Liste entfernt.";
-      clearInterval(countdownTimer);
-      loadGames();
-      return;
-    }
-
-    if(countdown)countdown.textContent=`Diese Lobby bleibt noch ${left} Sekunden in der offenen Liste.`;
+    if(left<=0){if(countdown)countdown.textContent="Spiel läuft / Lobby wird geschlossen.";clearInterval(countdownTimer);loadGames();return}
+    if(countdown)countdown.textContent=`Start vor ${left} Sekunden`;
   };
-
   $("result").insertAdjacentHTML("beforeend",`<div id="battleCountdown" class="countdown"></div>`);
-  tick();
-  countdownTimer=setInterval(tick,1000);
+  tick();countdownTimer=setInterval(tick,1000);
+}
+
+function animateDice(finals){
+  return new Promise(resolve=>{
+    const ids=["p1d1","p1d2","p2d1","p2d2"];
+    ids.forEach(id=>$(id).classList.add("rolling"));
+    let ticks=0;
+    const timer=setInterval(()=>{
+      ticks++;
+      ids.forEach(id=>$(id).textContent=1+Math.floor(Math.random()*6));
+      if(ticks>=18){
+        clearInterval(timer);
+        ids.forEach((id,i)=>setDie(id,finals[i]));
+        resolve();
+      }
+    },85);
+  });
 }
 
 async function autoRollGame(g){
-  if(!db||!g?.player2_id)return;
+  if(!g?.player2_id||g.player1_id!==me.id||rolling)return;
+  if(g.player1_die1!=null||g.player2_die1!=null)return;
+  rolling=true;
 
-  /* Nur der Ersteller führt den einmaligen Wurf aus. */
-  if(g.player1_id!==me.id)return;
-
-  /* Wenn bereits Zahlen vorhanden sind, nichts erneut würfeln. */
-  if(g.player1_die1!=null||g.player1_die2!=null||g.player2_die1!=null||g.player2_die2!=null)return;
-
-  const a1=1+Math.floor(Math.random()*6);
-  const a2=1+Math.floor(Math.random()*6);
-  const b1=1+Math.floor(Math.random()*6);
-  const b2=1+Math.floor(Math.random()*6);
-
-  const creatorTotal=a1+a2;
-  const joinerTotal=b1+b2;
+  const a1=1+Math.floor(Math.random()*6),a2=1+Math.floor(Math.random()*6);
+  const b1=1+Math.floor(Math.random()*6),b2=1+Math.floor(Math.random()*6);
+  const creatorTotal=a1+a2,joinerTotal=b1+b2;
   const winner=creatorTotal===joinerTotal?"draw":creatorTotal>joinerTotal?"creator":"joiner";
+  const stake=Number(g.stake||0);
+  const totalPot=stake+Math.round(stake);
+  const ownerFee=Math.floor(totalPot*.05);
+  const payout=totalPot-ownerFee;
 
-  const {data,error}=await db.from("games")
-    .update({
-      player1_die1:a1,
-      player1_die2:a2,
-      player2_die1:b1,
-      player2_die2:b2,
-      creator_total:creatorTotal,
-      player2_total:joinerTotal,
-      winner,
-      status:"finished"
-    })
-    .eq("id",g.id)
-    .eq("status","ready")
-    .is("player1_die1",null)
-    .select()
-    .single();
+  $("result").innerHTML=`<b>🎲 Die Würfel rollen…</b><div class="small">Ergebnis wird sicher gespeichert.</div>`;
+  await animateDice([a1,a2,b1,b2]);
+
+  const {data,error}=await db.from("games").update({
+    player1_die1:a1,player1_die2:a2,player2_die1:b1,player2_die2:b2,
+    creator_total:creatorTotal,player2_total:joinerTotal,winner,status:"finished",
+    owner_fee:ownerFee,pot:totalPot,payout
+  }).eq("id",g.id).eq("status","ready").is("player1_die1",null).select().single();
 
   if(error){
-    console.error("Auto-Wurf:",error);
-    $("result").innerHTML=`<span class="small">Automatischer Wurf fehlgeschlagen: ${esc(error.message)}</span>`;
-    return;
+    console.error(error);
+    $("result").innerHTML=`<span class="small">Wurf konnte nicht gespeichert werden: ${esc(error.message)}</span>`;
+    rolling=false;return;
   }
-
   currentGame=data;
   renderFinishedGame(data);
   await loadGames();
+  await loadHistory();
+  rolling=false;
 }
 
 function renderFinishedGame(g){
   $("player1Name").textContent=g.player1_name||g.creator_name||"Ersteller";
-  $("player2Name").textContent=g.player2_name||"Beitritt";
-
+  $("player2Name").textContent=g.player2_name||"Mitspieler";
   $("player1Avatar").textContent=(g.player1_name||g.creator_name||"E").charAt(0).toUpperCase();
   $("player2Avatar").textContent=(g.player2_name||"B").charAt(0).toUpperCase();
-
-  setDie("p1d1",g.player1_die1);
-  setDie("p1d2",g.player1_die2);
-  setDie("p2d1",g.player2_die1);
-  setDie("p2d2",g.player2_die2);
-
-  $("p1sum").textContent="Summe: "+(g.creator_total??"-");
-  $("p2sum").textContent="Summe: "+(g.player2_total??"-");
-
+  setDie("p1d1",g.player1_die1);setDie("p1d2",g.player1_die2);setDie("p2d1",g.player2_die1);setDie("p2d2",g.player2_die2);
+  $("p1sum").textContent="Summe: "+(g.creator_total??"-");$("p2sum").textContent="Summe: "+(g.player2_total??"-");
   let winner="Unentschieden";
   if(g.winner==="creator")winner=(g.player1_name||"Ersteller")+" gewinnt!";
-  if(g.winner==="joiner")winner=(g.player2_name||"Beitritt")+" gewinnt!";
-
-  $("result").innerHTML=`<div class="winner">🏆 ${esc(winner)}</div>`;
-
+  if(g.winner==="joiner")winner=(g.player2_name||"Mitspieler")+" gewinnt!";
+  $("result").innerHTML=`<div class="winner">🏆 ${esc(winner)}</div><div class="small" style="margin-top:8px">Pot: ${Number(g.pot||0)} · Owner-Anteil 5%: ${Number(g.owner_fee||0)} · Auszahlung: ${Number(g.payout||0)}</div>`;
   if(countdownTimer)clearInterval(countdownTimer);
 }
 
 async function loadMessages(){
   const box=$("messages");
   const {data,error}=await db.from("messages").select("*").order("created_at",{ascending:true}).limit(100);
-
-  if(error){
-    box.innerHTML='<div class="small">Chat ist noch nicht lesbar. Prüfe die RLS-Policies für messages.</div>';
-    return;
-  }
-
-  box.innerHTML="";
-  (data||[]).forEach(addMessage);
-  box.scrollTop=box.scrollHeight;
+  if(error){box.innerHTML='<div class="small">Chat ist noch nicht lesbar. Prüfe die RLS-Policies für messages.</div>';return}
+  box.innerHTML="";(data||[]).forEach(addMessage);box.scrollTop=box.scrollHeight;
 }
-
 function addMessage(m){
-  $("messages").insertAdjacentHTML("beforeend",
-    `<div class="msg"><b>${esc(m.username||m.user_name||"Gast")}</b><p>${esc(m.content||m.message||"")}</p></div>`
-  );
+  $("messages").insertAdjacentHTML("beforeend",`<div class="msg"><b>${esc(m.username||m.user_name||"Gast")}</b><p>${esc(m.content||m.message||"")}</p></div>`);
   $("messages").scrollTop=$("messages").scrollHeight;
 }
-
 $("chatForm").onsubmit=async e=>{
-  e.preventDefault();
-  const text=$("chatInput").value.trim();
-  if(!text)return;
-
-  const {error}=await db.from("messages").insert({
-    user_id:me.id,
-    username:me.name,
-    content:text
-  });
-
-  if(error)alert("Nachricht konnte nicht gesendet werden: "+error.message);
-  else $("chatInput").value="";
+  e.preventDefault();const text=$("chatInput").value.trim();if(!text)return;
+  const {error}=await db.from("messages").insert({user_id:me.id,username:me.name,content:text});
+  if(error)alert("Nachricht konnte nicht gesendet werden: "+error.message);else $("chatInput").value="";
 };
 
 function subscribe(){
   channel=db.channel("neondice-live")
-    .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},payload=>addMessage(payload.new))
-    .on("postgres_changes",{event:"*",schema:"public",table:"games"},async payload=>{
-      await loadGames();
-
-      if(currentGame&&payload.new?.id===currentGame.id){
-        currentGame=payload.new;
-
-        if(payload.new.status==="finished"){
-          renderFinishedGame(payload.new);
-        }else{
-          renderGame(payload.new);
-        }
-      }
-    })
-    .on("postgres_changes",{event:"*",schema:"public",table:"profiles"},()=>loadProfile())
-    .subscribe();
+  .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},payload=>addMessage(payload.new))
+  .on("postgres_changes",{event:"*",schema:"public",table:"games"},async payload=>{
+    await loadGames();
+    if(currentGame&&payload.new?.id===currentGame.id){
+      currentGame=payload.new;
+      if(payload.new.status==="finished")renderFinishedGame(payload.new);else renderGame(payload.new);
+    }
+  })
+  .on("postgres_changes",{event:"*",schema:"public",table:"profiles"},async()=>{await loadProfile();await loadPoints();})
+  .subscribe();
 }
 
 showPage("dice");
