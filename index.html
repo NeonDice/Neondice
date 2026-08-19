@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NeonDice</title>
+<style>
+:root{--bg:#070812;--panel:#111323;--panel2:#17192d;--line:#29234b;--purple:#8b5cf6;--purple2:#c084fc;--text:#f5f3ff;--muted:#a7a4bd;--good:#34d399;--danger:#fb7185}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#34205b 0,#10101d 34%,var(--bg) 65%);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+button,input{font:inherit}button{border:0;color:white;cursor:pointer}.app{display:grid;grid-template-columns:220px minmax(0,1fr) 310px;min-height:100vh}
+aside{padding:28px 18px;border-right:1px solid #24243a;background:#080a13}.logo{font-weight:900;font-size:24px;margin:4px 14px 34px}.logo span{color:var(--purple2)}nav{display:grid;gap:10px}nav button{background:#111323;border:1px solid transparent;border-radius:12px;text-align:left;padding:13px 15px}nav button.active,nav button:hover{background:#1b1930;border-color:#46317b}.content{padding:34px;max-width:1100px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.status{font-size:13px;color:var(--muted)}.dot{display:inline-block;width:9px;height:9px;background:var(--good);border-radius:50%;margin-right:6px}.card{background:linear-gradient(145deg,#141628,#0e101d);border:1px solid var(--line);border-radius:20px;padding:22px;margin-bottom:18px;box-shadow:0 12px 40px #0004}.hero{min-height:350px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}.dice{font-size:80px;background:#6d45df;border-radius:24px;padding:22px 38px;box-shadow:0 0 60px #7c3aed55}.btn{background:linear-gradient(135deg,#8b5cf6,#6d43d8);padding:12px 18px;border-radius:12px;font-weight:800}.btn.secondary{background:#1b1a2d;border:1px solid #3a315f}.btn.danger{background:#5b2234}.actions{display:flex;gap:10px;flex-wrap:wrap}.games{display:grid;gap:14px}.game{display:grid;grid-template-columns:1fr auto;gap:15px;align-items:center}.game h3{margin:0 0 6px}.meta{color:var(--muted);font-size:13px}.chat{border-left:1px solid #24243a;background:#090b14;padding:24px;display:flex;flex-direction:column}.chat h2{margin-top:0}.messages{flex:1;overflow:auto;min-height:300px;max-height:calc(100vh - 170px);display:flex;flex-direction:column;gap:9px}.msg{background:#131528;border:1px solid #242542;border-radius:12px;padding:9px 11px}.msg b{color:#c4a7ff;font-size:12px}.msg p{margin:4px 0 0;word-break:break-word}.chatform{display:flex;gap:7px;margin-top:12px}.input{width:100%;background:#0e101d;border:1px solid #302c50;color:white;border-radius:11px;padding:12px;outline:none}.input:focus{border-color:#7c5ce3}.profile{display:flex;gap:15px;align-items:center}.avatar{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#8b5cf6,#f0abfc);font-size:25px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px}.item{padding:18px;border-radius:16px;background:#111323;border:1px solid #292546}.item strong{display:block;font-size:18px;margin-bottom:6px}.hidden{display:none}.notice{padding:12px;border-radius:12px;background:#241a38;border:1px solid #49326d;color:#d9ccf5;margin-bottom:14px}.small{font-size:12px;color:var(--muted)}@media(max-width:1050px){.app{grid-template-columns:190px minmax(0,1fr)}.chat{display:none}}@media(max-width:700px){.app{display:block}aside{position:sticky;top:0;z-index:10;border-right:0;border-bottom:1px solid #24243a;padding:10px}nav{grid-template-columns:repeat(4,1fr)}nav button{font-size:12px;text-align:center;padding:10px 5px}.logo{margin:5px;text-align:center;font-size:19px}.content{padding:15px}.top h1{font-size:22px}.hero{min-height:290px}.dice{font-size:55px}.game{grid-template-columns:1fr}.chat{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="logo">NEON<span>DICE</span></div>
+  <nav>
+    <button class="active" data-page="dice">🎲 Dice</button>
+    <button data-page="create">🎮 Create</button>
+    <button data-page="inventory">🎒 Inventory</button>
+    <button data-page="profile">👤 Profile</button>
+  </nav>
+</aside>
+
+<main class="content">
+  <div class="top"><div><h1 id="title">Two Dice Battle</h1><div class="status"><span class="dot"></span><span id="connection">Verbinde mit Supabase…</span></div></div><div id="userLabel" class="small"></div></div>
+
+  <section id="page-dice">
+    <div class="card hero">
+      <div class="small">Zwei Spieler · zwei Würfel von 1–6 · höhere Summe gewinnt</div>
+      <div id="diceDisplay" class="dice" style="margin:30px 0">?</div>
+      <div id="result" class="meta">Wähle eine Lobby oder erstelle eine neue.</div>
+    </div>
+    <div class="card"><h2>Offene Spiele</h2><div id="games" class="games"><div class="small">Lade Spiele…</div></div></div>
+  </section>
+
+  <section id="page-create" class="hidden">
+    <div class="card"><h2>Spiel erstellen</h2><p class="meta">Erstelle eine kostenlose Two-Dice-Lobby. Es werden keine Items oder Echtgeld eingesetzt.</p>
+      <input id="gameName" class="input" placeholder="Lobby-Name (z. B. Neon Battle)" maxlength="40">
+      <div class="actions" style="margin-top:12px"><button class="btn" id="createGame">Lobby erstellen</button></div>
+    </div>
+  </section>
+
+  <section id="page-inventory" class="hidden">
+    <div class="card"><h2>Inventory</h2><div class="notice">Diese Version zeigt nur Demo-/Testinventar. Roblox-Pets oder Gems werden nicht automatisch übertragen.</div><div id="inventory" class="grid"></div></div>
+  </section>
+
+  <section id="page-profile" class="hidden">
+    <div class="card"><h2>Profil</h2><div class="profile"><div id="avatar" class="avatar">N</div><div><h2 id="profileName" style="margin:0">Spieler</h2><div id="profileId" class="small"></div></div></div>
+      <hr style="border-color:#25243b;border-width:1px 0 0;margin:20px 0">
+      <input id="username" class="input" maxlength="24" placeholder="Username">
+      <div class="actions" style="margin-top:12px"><button class="btn" id="saveProfile">Profil speichern</button></div>
+    </div>
+  </section>
+</main>
+
+<section class="chat">
+  <h2>💬 Global Chat</h2>
+  <div id="messages" class="messages"></div>
+  <form id="chatForm" class="chatform"><input id="chatInput" class="input" maxlength="300" placeholder="Nachricht…"><button class="btn">➤</button></form>
+</section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://dtafhtluycvvisuehphd.supabase.co";
+const SUPABASE_KEY="sb_publishable_l2SONE96HDFKPj9Dd02RgA_e7LIB_j0";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let me={id:null,name:"Gast"};
+let currentGame=null;
+let channel=null;
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function showPage(page){
+  ["dice","create","inventory","profile"].forEach(p=>$("page-"+p).classList.toggle("hidden",p!==page));
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+  $("title").textContent={dice:"Two Dice Battle",create:"Create Game",inventory:"Inventory",profile:"Profile"}[page];
+  if(page==="inventory") loadInventory();
+  if(page==="profile") loadProfile();
+}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+
+async function init(){
+  $("connection").textContent="Verbinde…";
+  const {data:{user}}=await db.auth.getUser();
+  if(user){me.id=user.id; await loadProfile();}
+  else{
+    const guest=localStorage.getItem("neondice_guest")||("guest_"+Math.random().toString(36).slice(2,9));
+    localStorage.setItem("neondice_guest",guest); me.id=guest; me.name=localStorage.getItem("neondice_name")||"Gast";
+  }
+  $("userLabel").textContent=me.name;
+  $("connection").textContent="Online";
+  await loadGames(); await loadMessages(); subscribe();
+}
+
+async function loadProfile(){
+  if(!me.id)return;
+  const {data}=await db.from("profiles").select("*").eq("id",me.id).maybeSingle();
+  if(data){me.name=data.username||data.display_name||"Gast";}
+  $("profileName").textContent=me.name;
+  $("username").value=me.name==="Gast"?"":me.name;
+  $("profileId").textContent="ID: "+String(me.id).slice(0,12)+"…";
+  $("avatar").textContent=(me.name||"G").charAt(0).toUpperCase();
+  $("userLabel").textContent=me.name;
+}
+
+async function saveProfile(){
+  const name=$("username").value.trim();
+  if(!name){alert("Bitte einen Username eingeben.");return}
+  me.name=name; localStorage.setItem("neondice_name",name);
+  if(me.id && me.id.length>20){
+    const {error}=await db.from("profiles").upsert({id:me.id,username:name,display_name:name},{onConflict:"id"});
+    if(error){alert("Profil konnte nicht gespeichert werden: "+error.message);return}
+  }
+  await loadProfile(); alert("Profil gespeichert.");
+}
+$("saveProfile").onclick=saveProfile;
+
+async function loadInventory(){
+  const box=$("inventory"); box.innerHTML="";
+  if(me.id && me.id.length>20){
+    const {data,error}=await db.from("inventory").select("*").eq("user_id",me.id).order("created_at",{ascending:false});
+    if(!error && data?.length){
+      data.forEach(i=>box.insertAdjacentHTML("beforeend",`<div class="item"><strong>📦 ${esc(i.item_name||i.name||"Item")}</strong><span class="small">Menge: ${esc(i.quantity??1)}</span></div>`));
+      return;
+    }
+  }
+  box.innerHTML=`<div class="item"><strong>🎒 Test Item</strong><span class="small">Demo-Inventar</span></div><div class="item"><strong>💎 Gems</strong><span class="small">0</span></div>`;
+}
+
+async function loadGames(){
+  const box=$("games");
+  const {data,error}=await db.from("games").select("*").order("created_at",{ascending:false}).limit(30);
+  if(error){box.innerHTML=`<div class="small">Spiele konnten nicht geladen werden. Prüfe die RLS-Policies der Tabelle games.</div>`;return}
+  if(!data?.length){box.innerHTML='<div class="small">Noch keine offenen Spiele. Erstelle das erste!</div>';return}
+  box.innerHTML="";
+  data.filter(g=>String(g.status||"open")!=="finished").forEach(g=>{
+    const p1=g.player1_name||g.creator_name||"Spieler 1", p2=g.player2_name||"Wartet…";
+    box.insertAdjacentHTML("beforeend",`<div class="card game"><div><h3>🎲 ${esc(g.name||"Two Dice Battle")}</h3><div class="meta">${esc(p1)} VS ${esc(p2)}</div><div class="small">Status: ${esc(g.status||"open")}</div></div><div class="actions">${g.player2_id?`<button class="btn secondary" onclick="viewGame('${g.id}')">Ansehen</button>`:`<button class="btn" onclick="joinGame('${g.id}')">Join</button>`}</div></div>`);
+  });
+}
+
+async function createGame(){
+  const name=$("gameName").value.trim()||"Neon Battle";
+  const row={name,creator_id:me.id,creator_name:me.name,player1_id:me.id,player1_name:me.name,status:"open"};
+  const {data,error}=await db.from("games").insert(row).select().single();
+  if(error){alert("Lobby konnte nicht erstellt werden: "+error.message);return}
+  currentGame=data; showPage("dice"); renderGame(data);
+}
+$("createGame").onclick=createGame;
+
+async function joinGame(id){
+  const {data,error}=await db.from("games").update({player2_id:me.id,player2_name:me.name,status:"ready"}).eq("id",id).is("player2_id",null).select().single();
+  if(error){alert("Beitritt fehlgeschlagen: "+error.message);return}
+  currentGame=data; renderGame(data);
+}
+
+async function viewGame(id){
+  const {data}=await db.from("games").select("*").eq("id",id).single();
+  if(data){currentGame=data;renderGame(data)}
+}
+
+function renderGame(g){
+  showPage("dice");
+  $("result").innerHTML=`<b>${esc(g.player1_name||"Spieler 1")}</b> VS <b>${esc(g.player2_name||"Wartet…")}</b>`;
+  if(g.player2_id && g.status!=="finished"){
+    const canRoll=g.player1_id===me.id || g.player2_id===me.id;
+    if(canRoll) $("result").innerHTML+=`<div class="actions" style="justify-content:center;margin-top:18px"><button class="btn" onclick="rollGame()">🎲 Würfeln</button></div>`;
+  }
+}
+
+async function rollGame(){
+  if(!currentGame?.player2_id)return;
+  const a=1+Math.floor(Math.random()*6), b=1+Math.floor(Math.random()*6);
+  $("diceDisplay").textContent=`${a} + ${b}`;
+  const total=a+b;
+  const winner=total>=7?me.name:"Gegner";
+  $("result").innerHTML=`Du würfelst <b>${a}</b> + <b>${b}</b> = <b>${total}</b><br><span class="small">Für eine echte, faire Mehrspieler-Runde sollte die Würfelentscheidung serverseitig erfolgen.</span>`;
+}
+
+async function loadMessages(){
+  const box=$("messages");
+  const {data,error}=await db.from("messages").select("*").order("created_at",{ascending:true}).limit(100);
+  if(error){box.innerHTML='<div class="small">Chat ist noch nicht lesbar. Prüfe die RLS-Policies für messages.</div>';return}
+  box.innerHTML="";
+  (data||[]).forEach(addMessage);
+  box.scrollTop=box.scrollHeight;
+}
+function addMessage(m){
+  const box=$("messages");
+  box.insertAdjacentHTML("beforeend",`<div class="msg"><b>${esc(m.username||m.user_name||"Gast")}</b><p>${esc(m.content||m.message||"")}</p></div>`);
+  box.scrollTop=box.scrollHeight;
+}
+$("chatForm").onsubmit=async e=>{
+  e.preventDefault(); const text=$("chatInput").value.trim(); if(!text)return;
+  const {error}=await db.from("messages").insert({user_id:me.id,username:me.name,content:text});
+  if(error)alert("Nachricht konnte nicht gesendet werden: "+error.message); else $("chatInput").value="";
+};
+
+function subscribe(){
+  channel=db.channel("neondice-live")
+    .on("postgres_changes",{event:"*",schema:"public",table:"messages"},payload=>{if(payload.eventType==="INSERT")addMessage(payload.new)})
+    .on("postgres_changes",{event:"*",schema:"public",table:"games"},()=>loadGames())
+    .on("postgres_changes",{event:"*",schema:"public",table:"profiles"},()=>loadProfile())
+    .subscribe();
+}
+init();
+</script>
+</body>
+</html>
