@@ -1,0 +1,3250 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070812">
+<meta name="color-scheme" content="dark">
+<title>NeonDice</title>
+
+<style>
+:root{
+  --bg:#070812;
+  --bg2:#090b14;
+  --panel:#111323;
+  --panel2:#17192d;
+  --panel3:#0d0f1b;
+  --line:#2a2748;
+  --line2:#43366f;
+  --purple:#8b5cf6;
+  --purple2:#c084fc;
+  --purple3:#a78bfa;
+  --blue:#4f7cff;
+  --text:#f7f5ff;
+  --muted:#a6a3b9;
+  --good:#34d399;
+  --warn:#fbbf24;
+  --danger:#fb7185;
+  --gold:#ffd166;
+  --shadow:0 18px 58px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  min-height:100%;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+body{
+  overflow-x:hidden;
+  background:
+    radial-gradient(circle at 50% -12%,rgba(108,64,190,.48),transparent 34%),
+    radial-gradient(circle at 88% 10%,rgba(68,86,180,.22),transparent 28%),
+    radial-gradient(circle at 10% 42%,rgba(139,92,246,.10),transparent 24%),
+    var(--bg);
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.55}
+.hidden{display:none!important}
+.app{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:228px minmax(0,1fr) 318px;
+}
+.sidebar{
+  position:sticky;
+  top:0;
+  height:100vh;
+  padding:24px 15px;
+  background:#080a13;
+  border-right:1px solid #25243a;
+}
+.logo{
+  margin:5px 12px 28px;
+  font-size:24px;
+  font-weight:950;
+  letter-spacing:-1px;
+}
+.logo span{color:var(--purple2)}
+.nav{display:grid;gap:8px}
+.nav-label{
+  margin:20px 11px 3px;
+  color:#68647d;
+  font-size:10px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+}
+.nav button{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:13px 14px;
+  border:1px solid transparent;
+  border-radius:13px;
+  color:#c7c3d8;
+  background:#101221;
+  text-align:left;
+  transition:.15s ease;
+}
+.nav button:hover,
+.nav button.active{
+  color:#fff;
+  background:#1a1830;
+  border-color:#4e3d82;
+  box-shadow:0 12px 30px rgba(0,0,0,.18);
+}
+.content{
+  width:100%;
+  max-width:1220px;
+  min-width:0;
+  margin:0 auto;
+  padding:27px 30px 55px;
+}
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:15;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin:-8px -8px 20px;
+  padding:10px 8px;
+  background:linear-gradient(180deg,rgba(7,8,18,.97),rgba(7,8,18,.84),transparent);
+  backdrop-filter:blur(12px);
+}
+.topbar h1{
+  margin:0 0 5px;
+  font-size:25px;
+}
+.connection{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  color:var(--muted);
+  font-size:12px;
+}
+.connection-dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:var(--warn);
+  box-shadow:0 0 12px currentColor;
+}
+.connection.ok .connection-dot{background:var(--good)}
+.connection.bad .connection-dot{background:var(--danger)}
+.top-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.btn{
+  min-height:42px;
+  border:0;
+  border-radius:12px;
+  padding:10px 16px;
+  color:#fff;
+  font-weight:850;
+  background:linear-gradient(135deg,var(--purple),#6d43d8);
+  box-shadow:0 9px 24px rgba(93,53,180,.18);
+}
+.btn:hover{filter:brightness(1.07)}
+.btn.secondary{
+  background:#17172a;
+  border:1px solid #3b345e;
+  box-shadow:none;
+}
+.btn.danger{
+  background:#401a28;
+  border:1px solid #6f2c43;
+  box-shadow:none;
+}
+.btn.smallbtn{
+  min-height:34px;
+  padding:7px 10px;
+  font-size:12px;
+}
+.lang{
+  min-height:39px;
+  border:1px solid #39315c;
+  border-radius:11px;
+  padding:9px 12px;
+  background:#121426;
+  color:#fff;
+}
+.profile-button{
+  min-height:40px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  border:1px solid #39315c;
+  border-radius:13px;
+  padding:5px 11px 5px 6px;
+  background:#121426;
+  color:#fff;
+}
+.card{
+  margin-bottom:18px;
+  padding:21px;
+  border:1px solid var(--line);
+  border-radius:20px;
+  background:linear-gradient(145deg,#15172a,#0e101c);
+  box-shadow:var(--shadow);
+}
+.hero{
+  position:relative;
+  overflow:hidden;
+  min-height:450px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+}
+.hero:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 35%,rgba(124,58,237,.22),transparent 38%),
+    radial-gradient(circle at 16% 90%,rgba(76,29,149,.19),transparent 32%),
+    repeating-linear-gradient(-32deg,rgba(255,255,255,.014) 0 1px,transparent 1px 19px);
+}
+.hero>*{position:relative;z-index:1}
+.hero-title{
+  font-size:clamp(31px,5vw,54px);
+  font-weight:950;
+  letter-spacing:-1.7px;
+}
+.hero-sub{
+  max-width:730px;
+  margin:10px auto 0;
+  color:#c8c4d8;
+  line-height:1.6;
+}
+.balance{
+  color:#ccb6ff;
+  font-weight:950;
+}
+.avatar{
+  width:58px;
+  height:58px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border-radius:18px;
+  color:#fff;
+  background:linear-gradient(135deg,#8b5cf6,#f0abfc);
+  font-size:24px;
+  font-weight:950;
+  box-shadow:0 13px 33px rgba(124,58,237,.24);
+}
+.avatar.circle{border-radius:50%}
+.avatar.small{width:32px;height:32px;font-size:14px}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.battle{
+  width:100%;
+  max-width:830px;
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  gap:18px;
+  align-items:center;
+  margin-top:30px;
+}
+.player-side{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.player-name{
+  max-width:200px;
+  margin-top:8px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-weight:900;
+}
+.dice-row{
+  display:flex;
+  gap:10px;
+  margin-top:14px;
+}
+.die{
+  width:58px;
+  height:58px;
+  display:grid;
+  place-items:center;
+  border:2px solid #6e43c5;
+  border-radius:14px;
+  background:#17132a;
+  font-size:27px;
+  font-weight:950;
+}
+.die.rolled{
+  background:linear-gradient(135deg,#8b5cf6,#6235d1);
+  border-color:#b89cff;
+}
+.sum{
+  margin-top:8px;
+  color:#c4a7ff;
+  font-weight:900;
+}
+.vs{
+  color:#c084fc;
+  font-size:18px;
+  font-weight:950;
+}
+.result{
+  margin-top:22px;
+  color:var(--muted);
+}
+.winner{
+  padding:12px 18px;
+  border:1px solid #6540a9;
+  border-radius:14px;
+  background:#1d1830;
+  color:#fff;
+  font-weight:950;
+}
+.small{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.55;
+}
+.notice{
+  margin-bottom:14px;
+  padding:12px 14px;
+  border:1px solid #49346e;
+  border-radius:13px;
+  background:#211a35;
+  color:#ded5f3;
+}
+.notice.good{
+  border-color:#1f6f58;
+  background:#102c24;
+  color:#baf5e1;
+}
+.notice.warn{
+  border-color:#72521e;
+  background:#302617;
+  color:#ffe8a7;
+}
+.notice.bad{
+  border-color:#713044;
+  background:#351923;
+  color:#ffd0da;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(185px,1fr));
+  gap:13px;
+}
+.item{
+  padding:16px;
+  border:1px solid #292546;
+  border-radius:16px;
+  background:#111323;
+  transition:.15s ease;
+}
+.item:hover{border-color:#514081}
+.item.selected{
+  border-color:#a87dff;
+  background:#18142c;
+  box-shadow:0 0 0 1px rgba(139,92,246,.22);
+}
+.item-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:9px;
+}
+.item-name{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-weight:900;
+}
+.item-icon{
+  width:45px;
+  height:45px;
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  border-radius:12px;
+  background:linear-gradient(135deg,#35225f,#1c1734);
+  font-size:25px;
+}
+.check{
+  width:20px;
+  height:20px;
+  accent-color:var(--purple);
+}
+.gem-card{
+  padding:18px;
+  border:1px solid rgba(79,124,255,.35);
+  border-radius:17px;
+  background:
+    radial-gradient(circle at 80% 15%,rgba(75,140,255,.20),transparent 38%),
+    #101522;
+}
+.gem-icon{
+  width:58px;
+  height:58px;
+  display:grid;
+  place-items:center;
+  border-radius:15px;
+  background:linear-gradient(135deg,#2da9ff,#6268ff);
+  font-size:32px;
+}
+.gem-balance{
+  margin-top:4px;
+  color:#d0c1ff;
+  font-size:28px;
+  font-weight:950;
+}
+.input,.select{
+  width:100%;
+  padding:12px;
+  border:1px solid #302c50;
+  border-radius:11px;
+  outline:none;
+  background:#0e101d;
+  color:#fff;
+}
+.input:focus,.select:focus{
+  border-color:#7951cf;
+  box-shadow:0 0 0 3px rgba(139,92,246,.12);
+}
+.actions{
+  display:flex;
+  gap:9px;
+  flex-wrap:wrap;
+}
+.divider{
+  height:1px;
+  margin:20px 0;
+  background:#2a2648;
+}
+.game{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:15px;
+  align-items:center;
+}
+.game h3{margin:0 0 6px}
+.game-meta{color:var(--muted);font-size:12px}
+.status-pill{
+  display:inline-flex;
+  margin-top:8px;
+  padding:5px 9px;
+  border:1px solid #4b3772;
+  border-radius:999px;
+  background:#211a35;
+  font-size:11px;
+  font-weight:850;
+}
+.profile-shell{
+  overflow:hidden;
+  padding:0;
+}
+.profile-cover{
+  min-height:175px;
+  display:flex;
+  align-items:flex-end;
+  padding:23px;
+  background:
+    radial-gradient(circle at 80% 10%,rgba(192,132,252,.26),transparent 32%),
+    radial-gradient(circle at 20% 70%,rgba(79,124,255,.23),transparent 33%),
+    linear-gradient(135deg,#1d1740,#111528);
+  border-bottom:1px solid var(--line);
+}
+.profile-main{
+  width:100%;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  gap:18px;
+  align-items:end;
+}
+.profile-big-avatar{
+  width:104px;
+  height:104px;
+  border-radius:25px;
+  border:4px solid #111323;
+  font-size:40px;
+  box-shadow:0 18px 45px rgba(0,0,0,.35);
+}
+.profile-title{
+  margin:0;
+  font-size:clamp(26px,4vw,42px);
+  letter-spacing:-1px;
+}
+.profile-tags{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+.profile-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:6px 9px;
+  border:1px solid #45376f;
+  border-radius:999px;
+  background:rgba(15,14,29,.72);
+  color:#d9d1ee;
+  font-size:11px;
+  font-weight:800;
+}
+.profile-body{padding:22px}
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;
+}
+.stat{
+  min-width:0;
+  padding:14px;
+  border:1px solid #292546;
+  border-radius:14px;
+  background:#101221;
+}
+.stat-label{
+  color:var(--muted);
+  font-size:10px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.8px;
+}
+.stat strong{
+  display:block;
+  margin-top:5px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-size:20px;
+  white-space:nowrap;
+}
+.rank-row{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:12px;
+  align-items:center;
+}
+.rank-badge{
+  width:56px;
+  height:56px;
+  display:grid;
+  place-items:center;
+  border:1px solid #66518f;
+  border-radius:16px;
+  background:linear-gradient(135deg,#2f244c,#151526);
+  color:var(--gold);
+  font-size:20px;
+  font-weight:950;
+}
+.rank-progress{
+  height:11px;
+  overflow:hidden;
+  border-radius:999px;
+  background:#1a1730;
+}
+.rank-progress>div{
+  height:100%;
+  width:0;
+  border-radius:999px;
+  background:linear-gradient(90deg,#667dff,#8b5cf6,#c084fc);
+}
+.profile-columns{
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  gap:14px;
+}
+.history{
+  display:grid;
+  gap:9px;
+}
+.history-row{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:12px;
+  align-items:center;
+  padding:12px;
+  border:1px solid #292546;
+  border-radius:13px;
+  background:#0f1120;
+}
+.login-card{max-width:590px;margin:0 auto}
+.code-row{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:8px;
+}
+.code{
+  text-align:center;
+  text-transform:uppercase;
+  letter-spacing:4px;
+  font-weight:950;
+}
+.upgrader-layout{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.choice-list{
+  display:grid;
+  gap:8px;
+  max-height:350px;
+  overflow:auto;
+}
+.choice{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  padding:10px;
+  border:1px solid #292546;
+  border-radius:13px;
+  background:#0f1120;
+}
+.choice.selected{
+  border-color:#8464d5;
+  background:#18142c;
+}
+.choice-icon{
+  width:44px;
+  height:44px;
+  display:grid;
+  place-items:center;
+  border-radius:12px;
+  background:linear-gradient(135deg,#35225f,#1c1734);
+  font-size:24px;
+}
+.wheel-area{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(270px,410px);
+  gap:22px;
+  align-items:center;
+  margin-top:20px;
+}
+.wheel-shell{
+  position:relative;
+  width:min(360px,78vw);
+  aspect-ratio:1;
+  margin:0 auto;
+}
+.wheel{
+  position:absolute;
+  inset:0;
+  border:10px solid #161a28;
+  border-radius:50%;
+  background:conic-gradient(#3f76ff 0deg 162deg,#050505 162deg 360deg);
+  box-shadow:0 25px 65px rgba(0,0,0,.45);
+}
+.wheel:after{
+  content:"45%";
+  position:absolute;
+  inset:31%;
+  display:grid;
+  place-items:center;
+  border:1px solid #343b56;
+  border-radius:50%;
+  background:#10131e;
+  color:#fff;
+  font-size:25px;
+  font-weight:950;
+}
+.needle{
+  position:absolute;
+  z-index:3;
+  left:calc(50% - 2px);
+  top:22px;
+  width:4px;
+  height:calc(50% - 22px);
+  transform-origin:50% calc(100% + 22px);
+  border-radius:999px;
+  background:#fff;
+  transition:transform 2.8s cubic-bezier(.17,.67,.15,1);
+}
+.pointer{
+  position:absolute;
+  z-index:4;
+  top:-23px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:30px;
+}
+.upgrade-result{
+  min-height:32px;
+  text-align:center;
+  font-size:22px;
+  font-weight:950;
+}
+.chat-panel{
+  position:sticky;
+  top:0;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  padding:21px;
+  border-left:1px solid #25243a;
+  background:#090b14;
+}
+.chat-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.online{color:var(--good);font-size:12px}
+.messages{
+  flex:1;
+  min-height:250px;
+  overflow:auto;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin:13px 0;
+}
+.message{
+  padding:9px 11px;
+  border:1px solid #242542;
+  border-radius:12px;
+  background:#131528;
+}
+.message-user{
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#c4a7ff;
+  font-size:12px;
+  font-weight:900;
+}
+.message p{
+  margin:4px 0 0;
+  word-break:break-word;
+  line-height:1.45;
+}
+.chat-form{
+  display:flex;
+  gap:7px;
+}
+.chat-page{
+  min-height:620px;
+  display:flex;
+  flex-direction:column;
+}
+.chat-page .messages{max-height:none}
+.modal-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(7px);
+}
+.modal{
+  width:min(700px,100%);
+  max-height:90vh;
+  overflow:auto;
+  padding:20px;
+  border:1px solid #3b345c;
+  border-radius:18px;
+  background:#111323;
+  box-shadow:0 35px 100px #000;
+}
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.close{
+  border:0;
+  background:transparent;
+  color:#aaa4bd;
+  font-size:28px;
+}
+.gift-list{display:grid;gap:8px}
+.gift-row{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  padding:10px;
+  border:1px solid #292546;
+  border-radius:12px;
+  background:#0f1120;
+}
+.diagnostic{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+.diag{
+  padding:13px;
+  border:1px solid #2a2748;
+  border-radius:13px;
+  background:#0d101b;
+}
+.diag strong{display:block;margin-top:5px}
+.toast{
+  position:fixed;
+  z-index:150;
+  right:18px;
+  bottom:18px;
+  max-width:min(430px,calc(100vw - 36px));
+  padding:12px 15px;
+  border:1px solid #3b345d;
+  border-radius:13px;
+  background:#15172a;
+  color:#fff;
+  box-shadow:0 18px 55px #0009;
+}
+.mobile-nav{
+  position:fixed;
+  z-index:90;
+  left:10px;
+  right:10px;
+  bottom:calc(8px + env(safe-area-inset-bottom));
+  display:none;
+  grid-template-columns:repeat(6,1fr);
+  gap:4px;
+  padding:5px;
+  border:1px solid rgba(102,125,255,.26);
+  border-radius:17px;
+  background:rgba(13,15,27,.96);
+  backdrop-filter:blur(12px);
+}
+.mobile-nav button{
+  padding:7px 2px;
+  border:0;
+  border-radius:11px;
+  background:transparent;
+  color:#949bb1;
+  font-size:9px;
+  font-weight:850;
+}
+.mobile-nav button span{
+  display:block;
+  font-size:20px;
+  margin-bottom:2px;
+}
+.mobile-nav button.active{
+  color:#fff;
+  background:rgba(102,125,255,.15);
+}
+@media(max-width:1160px){
+  .app{grid-template-columns:190px minmax(0,1fr)}
+  .chat-panel{display:none}
+}
+@media(max-width:800px){
+  body{padding-bottom:78px}
+  .app{display:block}
+  .sidebar{display:none}
+  .content{padding:14px 11px 35px}
+  .mobile-nav{display:grid}
+  .topbar{align-items:flex-start}
+  .topbar h1{font-size:21px}
+  .profile-button span:last-child{display:none}
+  .battle{gap:7px}
+  .die{width:48px;height:48px;font-size:22px}
+  .player-name{max-width:105px;font-size:13px}
+  .vs{font-size:14px}
+  .game{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .profile-main{grid-template-columns:1fr;text-align:center}
+  .profile-big-avatar{margin:auto}
+  .profile-tags{justify-content:center}
+  .profile-actions{justify-content:center}
+  .profile-columns{grid-template-columns:1fr}
+  .upgrader-layout{grid-template-columns:1fr}
+  .wheel-area{grid-template-columns:1fr}
+  .diagnostic{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<aside class="sidebar">
+  <div class="logo">NEON<span>DICE</span></div>
+
+  <nav class="nav">
+    <button class="active" data-page="dice"><span>🎲</span><span data-i18n="navDice">Dice</span></button>
+    <button data-page="create"><span>🎮</span><span data-i18n="navCreate">Create</span></button>
+    <button data-page="inventory"><span>🎒</span><span data-i18n="navInventory">Inventory</span></button>
+    <button data-page="upgrader"><span>⬆️</span><span data-i18n="navUpgrader">Upgrader</span></button>
+    <div class="nav-label">Community</div>
+    <button data-page="chat"><span>💬</span><span data-i18n="navChat">Chat</span></button>
+    <button data-page="profile"><span>👤</span><span data-i18n="navProfile">Profil</span></button>
+    <button data-page="ranks"><span>🏆</span><span data-i18n="navRanks">Ränge</span></button>
+  </nav>
+</aside>
+
+<main class="content">
+
+<header class="topbar">
+  <div>
+    <h1 id="pageTitle">NeonDice</h1>
+    <div id="connection" class="connection">
+      <span class="connection-dot"></span>
+      <span id="connectionText">Supabase wird geprüft…</span>
+    </div>
+  </div>
+
+  <div class="top-actions">
+    <button class="lang" id="langBtn" type="button">EN</button>
+
+    <button class="profile-button" id="topProfileButton" type="button">
+      <span class="avatar small circle" id="topAvatar">?</span>
+      <span id="topProfileText">Roblox Login</span>
+    </button>
+  </div>
+</header>
+
+<section id="page-dice" class="page">
+  <div class="card hero">
+    <div class="hero-title">Neon Dice Battle</div>
+    <div class="hero-sub" data-i18n="diceSubtitle">
+      Wähle Huges und Gems. Match, Join, Würfel und Auszahlung werden serverseitig verarbeitet.
+    </div>
+    <div id="heroBalance" class="balance" style="margin-top:10px">💎 Gems: –</div>
+
+    <div class="battle">
+      <div class="player-side">
+        <div class="avatar circle" id="player1Avatar">?</div>
+        <div class="player-name" id="player1Name">Ersteller</div>
+        <div class="dice-row">
+          <div class="die" id="p1d1">?</div>
+          <div class="die" id="p1d2">?</div>
+        </div>
+        <div class="sum" id="p1sum">–</div>
+      </div>
+
+      <div class="vs">VS</div>
+
+      <div class="player-side">
+        <div class="avatar circle" id="player2Avatar">?</div>
+        <div class="player-name" id="player2Name">Wartet…</div>
+        <div class="dice-row">
+          <div class="die" id="p2d1">?</div>
+          <div class="die" id="p2d2">?</div>
+        </div>
+        <div class="sum" id="p2sum">–</div>
+      </div>
+    </div>
+
+    <div id="gameResult" class="result">Erstelle ein Match oder tritt einem offenen Match bei.</div>
+
+    <div class="actions" style="margin-top:16px">
+      <button class="btn hidden" id="rollGameButton" type="button">🎲 Würfel serverseitig</button>
+      <button class="btn secondary hidden" id="cancelGameButton" type="button">Match abbrechen</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+      <h2 style="margin:0" data-i18n="openGames">Offene Spiele</h2>
+      <button class="btn secondary smallbtn" id="refreshGamesButton" type="button" data-i18n="refresh">Aktualisieren</button>
+    </div>
+    <div id="games" style="margin-top:14px"><div class="small">Laden…</div></div>
+  </div>
+</section>
+
+<section id="page-create" class="page hidden">
+  <div class="card">
+    <h2 data-i18n="createTitle">Match erstellen</h2>
+
+    <div id="createLoginNotice" class="notice warn">
+      Für ein Match musst du mit Roblox verifiziert sein.
+    </div>
+
+    <div class="actions" style="margin-bottom:14px">
+      <button class="btn secondary smallbtn" id="selectAllButton" type="button" data-i18n="selectAll">Alle auswählen</button>
+      <button class="btn secondary smallbtn" id="clearAllButton" type="button" data-i18n="clearSelection">Auswahl löschen</button>
+    </div>
+
+    <div id="createInventory" class="grid"><div class="small">Inventar wird geladen…</div></div>
+
+    <div class="divider"></div>
+
+    <div class="gem-card">
+      <div style="display:flex;gap:13px;align-items:center">
+        <div class="gem-icon">💎</div>
+        <div>
+          <div class="small" data-i18n="yourGems">Deine Gems</div>
+          <div id="createGemBalance" class="gem-balance">–</div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px">
+        <label class="small" for="gemStakeInput" data-i18n="gemStake">Gem-Einsatz</label>
+        <input id="gemStakeInput" class="input" type="number" min="1" step="1" inputmode="numeric" value="1" style="margin-top:6px">
+      </div>
+    </div>
+
+    <div id="createSummary" class="small" style="margin-top:12px">Noch keine Items ausgewählt.</div>
+    <div id="createError" class="notice bad hidden" style="margin-top:13px"></div>
+
+    <div class="actions" style="margin-top:14px">
+      <button class="btn" id="createMatchButton" type="button" data-i18n="createMatch">Match erstellen</button>
+    </div>
+  </div>
+</section>
+
+<section id="page-inventory" class="page hidden">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+      <div>
+        <h2 style="margin:0" data-i18n="inventoryTitle">Dein Inventar</h2>
+        <div class="small">Huges werden mit 🐱 dargestellt.</div>
+      </div>
+      <button class="btn secondary smallbtn" id="refreshInventoryButton" type="button" data-i18n="refresh">Aktualisieren</button>
+    </div>
+
+    <div id="inventory" class="grid" style="margin-top:15px"><div class="small">Inventar wird geladen…</div></div>
+  </div>
+
+  <div class="card">
+    <h2>💎 Gems</h2>
+    <div class="gem-card">
+      <div style="display:flex;gap:13px;align-items:center">
+        <div class="gem-icon">💎</div>
+        <div>
+          <div class="small" data-i18n="currentBalance">Aktueller Bestand</div>
+          <div id="inventoryGemBalance" class="gem-balance">–</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="page-upgrader" class="page hidden">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+      <div>
+        <h2 style="margin:0">⬆️ <span data-i18n="upgraderTitle">Upgrader</span></h2>
+        <div class="small" data-i18n="upgraderHint">45 % Gewinn · 55 % Verlust. Der Server entscheidet das Ergebnis.</div>
+      </div>
+      <button class="btn secondary smallbtn" id="refreshUpgraderButton" type="button" data-i18n="refresh">Aktualisieren</button>
+    </div>
+
+    <div class="upgrader-layout" style="margin-top:18px">
+      <div>
+        <h3 data-i18n="yourItem">Dein Item</h3>
+        <div id="upgradeSourceList" class="choice-list"></div>
+      </div>
+
+      <div>
+        <h3 data-i18n="targetPet">Ziel-Pet</h3>
+        <div id="upgradeTargetList" class="choice-list"></div>
+      </div>
+    </div>
+
+    <div class="wheel-area">
+      <div>
+        <div class="notice">
+          <strong data-i18n="upgradeRules">Upgrader-Regeln</strong>
+          <div class="small" style="margin-top:7px">
+            Blau = Gewinn (45 %). Schwarz = Verlust (55 %). Die Nadelanimation ist nur die Darstellung des serverseitigen Ergebnisses.
+          </div>
+        </div>
+
+        <div id="upgradeSelectionSummary" class="small">Wähle ein eigenes Item und ein Ziel-Pet.</div>
+
+        <div class="actions" style="margin-top:14px">
+          <button class="btn" id="startUpgradeButton" type="button" data-i18n="startUpgrade">Upgrade starten</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="wheel-shell">
+          <div class="wheel"></div>
+          <div class="pointer">▼</div>
+          <div class="needle" id="upgradeNeedle"></div>
+        </div>
+        <div id="upgradeResult" class="upgrade-result">Bereit</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="page-chat" class="page hidden">
+  <div class="card chat-page">
+    <div class="chat-head">
+      <h2 style="margin:0">💬 <span data-i18n="globalChat">Global Chat</span></h2>
+      <span class="online">● Online</span>
+    </div>
+
+    <div id="pageMessages" class="messages"><div class="small">Chat wird geladen…</div></div>
+
+    <form id="pageChatForm" class="chat-form">
+      <input id="pageChatInput" class="input" maxlength="200" autocomplete="off" placeholder="Nachricht…">
+      <button class="btn" type="submit">➤</button>
+    </form>
+  </div>
+</section>
+
+<section id="page-profile" class="page hidden">
+
+  <div id="profileLoginCard" class="card login-card">
+    <h2>👤 <span data-i18n="robloxLogin">Roblox Login</span></h2>
+    <p class="small" data-i18n="loginHint">Benutzername eingeben → Code erzeugen → Code in Roblox-Bio → Bio prüfen.</p>
+
+    <div style="display:grid;gap:10px">
+      <label class="small" for="robloxUsername" data-i18n="robloxUsername">Roblox Benutzername</label>
+      <input id="robloxUsername" class="input" maxlength="32" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Roblox Username">
+
+      <div id="ownerUidWrap" class="hidden">
+        <label class="small" for="ownerUid">Owner UID</label>
+        <input id="ownerUid" class="input" maxlength="100" autocomplete="off" placeholder="Supabase UID" style="margin-top:6px">
+        <div class="small" style="margin-top:5px">Für IchDerMeister0 zusätzlich erforderlich. Die echte Prüfung bleibt serverseitig.</div>
+      </div>
+
+      <button class="btn" id="generateCodeButton" type="button" data-i18n="generateCode">Code erzeugen</button>
+
+      <div id="codeWrap" class="hidden">
+        <div class="small" style="margin-bottom:6px" data-i18n="yourCode">Dein Code</div>
+
+        <div class="code-row">
+          <input id="verificationCode" class="input code" readonly aria-label="Roblox Bio Code">
+          <button class="btn secondary" id="copyCodeButton" type="button" data-i18n="copy">Kopieren</button>
+        </div>
+
+        <div class="small" style="margin-top:8px">Kopiere den Code in deine Roblox-Bio. Danach prüfst du die Bio.</div>
+      </div>
+
+      <button class="btn secondary hidden" id="verifyRobloxButton" type="button" data-i18n="verifyBio">Roblox Bio prüfen</button>
+      <div id="loginStatus" class="small" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <div id="profileShell" class="card profile-shell hidden">
+    <div class="profile-cover">
+      <div class="profile-main">
+        <div class="avatar profile-big-avatar" id="profileAvatar">N</div>
+
+        <div>
+          <h1 id="profileName" class="profile-title">Spieler</h1>
+
+          <div class="profile-tags">
+            <span class="profile-tag" id="profileVerifiedTag">✓ Roblox verified</span>
+            <span class="profile-tag" id="profileRankTag">🏆 Rang –</span>
+            <span class="profile-tag" id="profileRobloxTag">Roblox: –</span>
+          </div>
+        </div>
+
+        <div class="actions profile-actions">
+          <button class="btn secondary smallbtn" id="refreshProfileButton" type="button" data-i18n="refresh">Aktualisieren</button>
+          <button class="btn danger smallbtn" id="logoutButton" type="button" data-i18n="logout">Abmelden</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-body">
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-label">Gems</div>
+          <strong id="profileGems">0</strong>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Games</div>
+          <strong id="profileGames">0</strong>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Wins</div>
+          <strong id="profileWins">0</strong>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Winrate</div>
+          <strong id="profileWinRate">0%</strong>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Wagered</div>
+          <strong id="profileWagered">0</strong>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="rank-row">
+        <div id="profileRankBadge" class="rank-badge">0</div>
+
+        <div>
+          <div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:7px">
+            <strong id="profileRankName">Rang 0</strong>
+            <span id="profileRankPercent" class="small">0%</span>
+          </div>
+
+          <div class="rank-progress">
+            <div id="profileRankProgress"></div>
+          </div>
+
+          <div id="profileRankText" class="small" style="margin-top:7px">–</div>
+        </div>
+
+        <div class="profile-tag">💎 Rank</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="profile-columns">
+        <div>
+          <h2 data-i18n="recentGames">Letzte Spiele</h2>
+          <div id="profileHistory" class="history"><div class="small">Laden…</div></div>
+        </div>
+
+        <div>
+          <h2 data-i18n="profileSettings">Profil</h2>
+
+          <label class="small" for="profileUsernameInput" data-i18n="displayName">Anzeigename</label>
+          <input id="profileUsernameInput" class="input" maxlength="24" autocomplete="off" style="margin-top:6px">
+
+          <div class="actions" style="margin-top:10px">
+            <button class="btn" id="saveProfileButton" type="button" data-i18n="saveProfile">Profil speichern</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <h3 data-i18n="inventoryPreview">Inventar Vorschau</h3>
+          <div id="profileInventoryPreview" class="grid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<section id="page-ranks" class="page hidden">
+  <div class="card">
+    <h2>🏆 <span data-i18n="ranks">Ränge</span></h2>
+    <div class="small">Der Rank basiert auf wagered_gems.</div>
+
+    <div class="grid" style="margin-top:14px">
+      <div class="item"><div class="item-name">🥉 Rang 1</div><div class="small">1M wagered Gems</div></div>
+      <div class="item"><div class="item-name">🥈 Rang 2</div><div class="small">10M wagered Gems</div></div>
+      <div class="item"><div class="item-name">🥇 Rang 3</div><div class="small">100M wagered Gems</div></div>
+      <div class="item"><div class="item-name">💎 Rang 4</div><div class="small">1B wagered Gems</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Supabase Diagnose</h2>
+    <div class="small" style="margin-bottom:13px">Die Data API wird über eine echte öffentliche Tabelle geprüft – nicht über den PostgREST-Root.</div>
+
+    <div class="diagnostic">
+      <div class="diag"><div class="small">Projekt</div><strong id="diagProject">–</strong></div>
+      <div class="diag"><div class="small">Publishable Key</div><strong id="diagKey">–</strong></div>
+      <div class="diag"><div class="small">Data API</div><strong id="diagDataApi">–</strong></div>
+      <div class="diag"><div class="small">Auth</div><strong id="diagAuth">–</strong></div>
+      <div class="diag"><div class="small">Chat</div><strong id="diagChat">–</strong></div>
+      <div class="diag"><div class="small">Upgrader</div><strong id="diagUpgrader">–</strong></div>
+    </div>
+
+    <div class="actions" style="margin-top:13px">
+      <button class="btn" id="runDiagnosticsButton" type="button">Diagnose erneut ausführen</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<aside class="chat-panel">
+  <div class="chat-head">
+    <strong>💬 Global Chat</strong>
+    <span class="online">● Online</span>
+  </div>
+
+  <div id="sideMessages" class="messages"><div class="small">Chat wird geladen…</div></div>
+
+  <form id="sideChatForm" class="chat-form">
+    <input id="sideChatInput" class="input" maxlength="200" autocomplete="off" placeholder="Nachricht…">
+    <button class="btn" type="submit">➤</button>
+  </form>
+</aside>
+
+</div>
+
+<nav class="mobile-nav">
+  <button class="active" data-mobile-page="dice"><span>🎲</span>Dice</button>
+  <button data-mobile-page="create"><span>🎮</span>Create</button>
+  <button data-mobile-page="inventory"><span>🎒</span>Bag</button>
+  <button data-mobile-page="upgrader"><span>⬆️</span>Upgrader</button>
+  <button data-mobile-page="chat"><span>💬</span>Chat</button>
+  <button data-mobile-page="profile"><span>👤</span>Profil</button>
+</nav>
+
+<div id="userModalBackdrop" class="modal-backdrop hidden">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="userModalTitle">Spieler</h2>
+      <button class="close" id="closeUserModalButton" type="button">×</button>
+    </div>
+    <div id="userModalBody"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+"use strict";
+
+const CONFIG = Object.freeze({
+  supabaseUrl:"https://dtafhtluycvvisuehphd.supabase.co",
+  publishableKey:"sb_publishable_l2SONE96HDFKPj9Dd02RgA_e7LIB_j0",
+  projectRef:"dtafhtluycvvisuehphd",
+  ownerUsername:"IchDerMeister0",
+  edgeCode:"roblox-code-v2",
+  edgeLogin:"roblox-login-v2"
+});
+
+const RANKS = [
+  {rank:0,threshold:0},
+  {rank:1,threshold:1000000},
+  {rank:2,threshold:10000000},
+  {rank:3,threshold:100000000},
+  {rank:4,threshold:1000000000}
+];
+
+const I18N = {
+  de:{
+    navDice:"Dice",
+    navCreate:"Create",
+    navInventory:"Inventory",
+    navUpgrader:"Upgrader",
+    navChat:"Chat",
+    navProfile:"Profil",
+    navRanks:"Ränge",
+    diceSubtitle:"Wähle Huges und Gems. Match, Join, Würfel und Auszahlung werden serverseitig verarbeitet.",
+    openGames:"Offene Spiele",
+    refresh:"Aktualisieren",
+    createTitle:"Match erstellen",
+    selectAll:"Alle auswählen",
+    clearSelection:"Auswahl löschen",
+    yourGems:"Deine Gems",
+    gemStake:"Gem-Einsatz",
+    createMatch:"Match erstellen",
+    inventoryTitle:"Dein Inventar",
+    currentBalance:"Aktueller Bestand",
+    upgraderTitle:"Upgrader",
+    upgraderHint:"45 % Gewinn · 55 % Verlust. Der Server entscheidet das Ergebnis.",
+    yourItem:"Dein Item",
+    targetPet:"Ziel-Pet",
+    upgradeRules:"Upgrader-Regeln",
+    startUpgrade:"Upgrade starten",
+    globalChat:"Global Chat",
+    robloxLogin:"Roblox Login",
+    loginHint:"Benutzername eingeben → Code erzeugen → Code in Roblox-Bio → Bio prüfen.",
+    robloxUsername:"Roblox Benutzername",
+    generateCode:"Code erzeugen",
+    yourCode:"Dein Code",
+    copy:"Kopieren",
+    verifyBio:"Roblox Bio prüfen",
+    logout:"Abmelden",
+    recentGames:"Letzte Spiele",
+    profileSettings:"Profil",
+    displayName:"Anzeigename",
+    saveProfile:"Profil speichern",
+    inventoryPreview:"Inventar Vorschau",
+    ranks:"Ränge"
+  },
+  en:{
+    navDice:"Dice",
+    navCreate:"Create",
+    navInventory:"Inventory",
+    navUpgrader:"Upgrader",
+    navChat:"Chat",
+    navProfile:"Profile",
+    navRanks:"Ranks",
+    diceSubtitle:"Choose Huges and Gems. Match, join, dice and payout are processed server-side.",
+    openGames:"Open games",
+    refresh:"Refresh",
+    createTitle:"Create match",
+    selectAll:"Select all",
+    clearSelection:"Clear selection",
+    yourGems:"Your Gems",
+    gemStake:"Gem stake",
+    createMatch:"Create match",
+    inventoryTitle:"Your inventory",
+    currentBalance:"Current balance",
+    upgraderTitle:"Upgrader",
+    upgraderHint:"45% win · 55% loss. The server decides the result.",
+    yourItem:"Your item",
+    targetPet:"Target pet",
+    upgradeRules:"Upgrader rules",
+    startUpgrade:"Start upgrade",
+    globalChat:"Global Chat",
+    robloxLogin:"Roblox Login",
+    loginHint:"Enter username → create code → put code in Roblox bio → verify.",
+    robloxUsername:"Roblox username",
+    generateCode:"Create code",
+    yourCode:"Your code",
+    copy:"Copy",
+    verifyBio:"Verify Roblox bio",
+    logout:"Logout",
+    recentGames:"Recent games",
+    profileSettings:"Profile",
+    displayName:"Display name",
+    saveProfile:"Save profile",
+    inventoryPreview:"Inventory preview",
+    ranks:"Ranks"
+  }
+};
+
+const state = {
+  lang:localStorage.getItem("neondice_lang") || "de",
+  page:"dice",
+  session:null,
+  user:null,
+  profile:null,
+  inventory:[],
+  games:[],
+  messages:[],
+  targets:[],
+  selectedItems:new Set(),
+  currentGame:null,
+  upgradeItemId:null,
+  upgradeTargetId:null,
+  code:"",
+  challengeId:"",
+  codeUsername:"",
+  realtime:null,
+  busy:{
+    login:false,
+    create:false,
+    join:false,
+    roll:false,
+    upgrade:false,
+    chat:false,
+    gift:false
+  }
+};
+
+const db = window.supabase.createClient(
+  CONFIG.supabaseUrl,
+  CONFIG.publishableKey,
+  {
+    auth:{
+      persistSession:true,
+      autoRefreshToken:true,
+      detectSessionInUrl:true
+    },
+    global:{
+      headers:{
+        "x-client-info":"neondice-web-upgrader-profile-chat"
+      }
+    }
+  }
+);
+
+const $ = id => document.getElementById(id);
+
+function esc(value){
+  return String(value ?? "").replace(/[&<>"']/g,char=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  }[char]));
+}
+
+function t(key){
+  return I18N[state.lang]?.[key] || key;
+}
+
+function clean(value){
+  return String(value ?? "").trim();
+}
+
+function number(value,fallback=0){
+  const n=Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function integer(value,fallback=0){
+  return Math.floor(number(value,fallback));
+}
+
+function formatNumber(value){
+  return new Intl.NumberFormat(state.lang==="de"?"de-DE":"en-US").format(number(value));
+}
+
+function formatPercent(value){
+  return `${number(value).toFixed(2)}%`;
+}
+
+function isAuthenticated(){
+  return !!state.session?.user?.id;
+}
+
+function isVerified(){
+  return !!state.profile?.roblox_verified;
+}
+
+function currentUsername(){
+  return state.profile?.roblox_username || state.profile?.username || "Spieler";
+}
+
+function currentGems(){
+  return Math.max(0,integer(state.profile?.gems || state.profile?.gem_balance || 0));
+}
+
+function showToast(message){
+  const el=$("toast");
+  el.textContent=clean(message);
+  el.classList.remove("hidden");
+  clearTimeout(window.__neondiceToast);
+  window.__neondiceToast=setTimeout(()=>el.classList.add("hidden"),3200);
+}
+
+function setConnection(text,kind=""){
+  $("connection").classList.remove("ok","bad");
+  if(kind)$("connection").classList.add(kind);
+  $("connectionText").textContent=text;
+}
+
+function renderAvatar(el,url,name){
+  if(!el)return;
+  el.innerHTML="";
+  if(url){
+    const img=document.createElement("img");
+    img.src=url;
+    img.alt=name || "Avatar";
+    img.loading="lazy";
+    img.onerror=()=>{el.textContent=(name||"?").charAt(0).toUpperCase();};
+    el.appendChild(img);
+  }else{
+    el.textContent=(name||"?").charAt(0).toUpperCase();
+  }
+}
+
+function normalizeError(error){
+  const message=clean(error?.message || error?.error_description || error?.error || error || "Unbekannter Fehler.");
+
+  const map={
+    not_authenticated:"Du bist nicht angemeldet.",
+    profile_missing:"Dein Supabase-Profil fehlt.",
+    verification_required:"Dein Roblox-Konto ist noch nicht verifiziert.",
+    invalid_stake:"Der Gem-Einsatz ist ungültig.",
+    insufficient_gems:"Du hast nicht genügend Gems.",
+    inventory_selection_required:"Wähle mindestens ein Huge aus.",
+    invalid_inventory_selection:"Mindestens ein ausgewähltes Inventar-Item ist ungültig.",
+    inventory_item_empty:"Ein ausgewähltes Item ist nicht mehr verfügbar.",
+    game_not_found:"Das Spiel wurde nicht gefunden.",
+    game_not_open:"Das Spiel ist nicht mehr offen.",
+    cannot_join_own_game:"Du kannst deinem eigenen Match nicht beitreten.",
+    stake_out_of_range:"Der Einsatz liegt nicht im erlaubten Bereich.",
+    game_not_ready:"Das Spiel ist noch nicht bereit.",
+    not_a_player:"Du bist kein Spieler dieses Matches.",
+    invalid_message:"Die Chat-Nachricht ist ungültig.",
+    chat_rate_limited:"Zu viele Nachrichten. Bitte kurz warten.",
+    invalid_username:"Der Roblox-Benutzername ist ungültig.",
+    roblox_user_not_found:"Roblox-Benutzer nicht gefunden.",
+    username_and_10_letter_code_required:"Benutzername und 10-Buchstaben-Code werden benötigt.",
+    challenge_not_found_or_expired:"Der Verifizierungs-Code wurde nicht gefunden oder ist abgelaufen. Erzeuge bitte einen neuen.",
+    code_not_in_roblox_bio:"Der Code wurde noch nicht in der Roblox-Bio gefunden.",
+    owner_uid_required_or_invalid:"Für das Owner-Konto ist die richtige Supabase-UID erforderlich.",
+    upgrade_item_not_found:"Das ausgewählte Upgrader-Item wurde nicht gefunden.",
+    upgrade_target_not_found:"Das Ziel-Pet wurde nicht gefunden.",
+    upgrade_not_allowed:"Dieses Upgrade ist nicht erlaubt."
+  };
+
+  return map[message] || message;
+}
+
+async function safeJson(response){
+  try{return await response.json();}catch{return {};}
+}
+
+async function callPublicEdge(slug,body){
+  const response=await fetch(`${CONFIG.supabaseUrl}/functions/v1/${encodeURIComponent(slug)}`,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "apikey":CONFIG.publishableKey
+    },
+    body:JSON.stringify(body)
+  });
+
+  const data=await safeJson(response);
+
+  if(!response.ok){
+    throw new Error(data?.error || data?.message || `Edge Function HTTP ${response.status}`);
+  }
+
+  if(data?.success===false || data?.ok===false){
+    throw new Error(data?.error || data?.message || "Edge Function fehlgeschlagen.");
+  }
+
+  return data;
+}
+
+async function rpcFallback(names,argVariants){
+  let lastError=null;
+
+  for(const name of names){
+    for(const args of argVariants){
+      const {data,error}=await db.rpc(name,args);
+
+      if(!error){
+        return {name,data};
+      }
+
+      lastError=error;
+
+      const msg=clean(error.message).toLowerCase();
+
+      if(
+        msg.includes("does not exist") ||
+        msg.includes("could not find") ||
+        msg.includes("schema cache") ||
+        msg.includes("function") && msg.includes("not found") ||
+        msg.includes("parameter") ||
+        msg.includes("argument")
+      ){
+        continue;
+      }
+
+      throw error;
+    }
+  }
+
+  throw lastError || new Error("Keine passende Supabase-RPC gefunden.");
+}
+
+function applyLanguage(){
+  document.documentElement.lang=state.lang;
+
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    el.textContent=t(el.dataset.i18n);
+  });
+
+  $("langBtn").textContent=state.lang==="de" ? "EN" : "DE";
+}
+
+function toggleLanguage(){
+  state.lang=state.lang==="de" ? "en" : "de";
+  localStorage.setItem("neondice_lang",state.lang);
+  applyLanguage();
+  renderGames();
+  renderInventory();
+  renderCreateInventory();
+  renderUpgrader();
+  renderProfile();
+  renderMessages();
+}
+
+function showPage(page){
+  const valid=["dice","create","inventory","upgrader","chat","profile","ranks"];
+
+  if(!valid.includes(page))page="dice";
+
+  state.page=page;
+
+  valid.forEach(name=>{
+    const section=$(`page-${name}`);
+    if(section)section.classList.toggle("hidden",name!==page);
+  });
+
+  document.querySelectorAll(".nav button[data-page]").forEach(button=>{
+    button.classList.toggle("active",button.dataset.page===page);
+  });
+
+  document.querySelectorAll(".mobile-nav button[data-mobile-page]").forEach(button=>{
+    button.classList.toggle("active",button.dataset.mobilePage===page);
+  });
+
+  const titles={
+    dice:"NeonDice",
+    create:state.lang==="de"?"Match erstellen":"Create match",
+    inventory:state.lang==="de"?"Inventar":"Inventory",
+    upgrader:"Upgrader",
+    chat:"Chat",
+    profile:state.lang==="de"?"Profil":"Profile",
+    ranks:state.lang==="de"?"Ränge":"Ranks"
+  };
+
+  $("pageTitle").textContent=titles[page] || "NeonDice";
+
+  if(page==="create"){
+    if(!isAuthenticated()){
+      showToast(state.lang==="de"?"Bitte zuerst einloggen.":"Please log in first.");
+      showPage("profile");
+      return;
+    }
+    loadInventory();
+  }
+
+  if(page==="inventory")loadInventory();
+
+  if(page==="upgrader"){
+    if(!isAuthenticated()){
+      showToast(state.lang==="de"?"Bitte zuerst einloggen.":"Please log in first.");
+      showPage("profile");
+      return;
+    }
+    Promise.allSettled([loadInventory(),loadUpgradeTargets()]);
+  }
+
+  if(page==="chat")loadMessages();
+
+  if(page==="profile"){
+    renderProfile();
+    if(isAuthenticated()){
+      Promise.allSettled([loadHistory(),loadInventory()]);
+    }
+  }
+}
+
+function updateTopProfile(){
+  if(!state.profile){
+    $("topAvatar").textContent="?";
+    $("topProfileText").textContent="Roblox Login";
+    return;
+  }
+
+  renderAvatar(
+    $("topAvatar"),
+    state.profile.avatar_url || state.profile.roblox_avatar_url || "",
+    currentUsername()
+  );
+
+  $("topProfileText").textContent=currentUsername();
+}
+
+function updateGemDisplays(){
+  const gems=formatNumber(currentGems());
+  $("heroBalance").textContent=`💎 Gems: ${gems}`;
+  $("createGemBalance").textContent=gems;
+  $("inventoryGemBalance").textContent=gems;
+  $("profileGems").textContent=gems;
+}
+
+async function loadSession(){
+  const {data,error}=await db.auth.getSession();
+  if(error)throw error;
+
+  state.session=data.session || null;
+  state.user=state.session?.user || null;
+
+  if(state.session){
+    const verified=await db.auth.getUser();
+    if(verified.error){
+      await db.auth.signOut().catch(()=>{});
+      state.session=null;
+      state.user=null;
+    }else{
+      state.user=verified.data.user || state.user;
+    }
+  }
+}
+
+function normalizeProfile(row){
+  if(!row)return null;
+
+  return {
+    ...row,
+    id:row.id || row.user_id || state.user?.id || null,
+    username:row.username || row.display_name || row.roblox_username || "Spieler",
+    roblox_username:row.roblox_username || row.roblox_name || row.username || "",
+    roblox_id:row.roblox_id || row.roblox_user_id || "",
+    avatar_url:row.avatar_url || row.roblox_avatar_url || row.avatar || "",
+    roblox_verified:Boolean(row.roblox_verified ?? row.verified ?? row.roblox_id),
+    gems:Math.max(0,integer(row.gems ?? row.gem_balance ?? 0)),
+    games_played:Math.max(0,integer(row.games_played ?? row.matches_played ?? 0)),
+    games_won:Math.max(0,integer(row.games_won ?? row.matches_won ?? 0)),
+    wagered_gems:Math.max(0,integer(row.wagered_gems ?? row.total_wagered_gems ?? 0)),
+    win_rate:number(row.win_rate,NaN)
+  };
+}
+
+async function loadProfile(){
+  if(!state.user){
+    state.profile=null;
+    renderProfile();
+    updateTopProfile();
+    updateGemDisplays();
+    return;
+  }
+
+  let row=null;
+  let rpcError=null;
+
+  const rpcResult=await db.rpc("get_my_neondice_profile_v2");
+
+  if(!rpcResult.error){
+    row=rpcResult.data;
+  }else{
+    rpcError=rpcResult.error;
+  }
+
+  if(!row){
+    const direct=await db.from("profiles").select("*").eq("id",state.user.id).maybeSingle();
+
+    if(!direct.error){
+      row=direct.data;
+    }else if(rpcError){
+      console.warn("profile rpc/direct",rpcError,direct.error);
+    }
+  }
+
+  state.profile=normalizeProfile(row || {
+    id:state.user.id,
+    username:state.user.user_metadata?.username || state.user.user_metadata?.roblox_username || "Spieler",
+    roblox_username:state.user.user_metadata?.roblox_username || "",
+    gems:0
+  });
+
+  renderProfile();
+  updateTopProfile();
+  updateGemDisplays();
+}
+
+function rankInfo(total){
+  let rank=0;
+
+  for(const tier of RANKS){
+    if(total>=tier.threshold)rank=tier.rank;
+  }
+
+  const current=RANKS.find(x=>x.rank===rank) || RANKS[0];
+  const next=RANKS.find(x=>x.rank===rank+1);
+
+  if(!next){
+    return {rank,percent:100,nextThreshold:null};
+  }
+
+  const span=Math.max(1,next.threshold-current.threshold);
+  const progress=Math.max(0,Math.min(1,(total-current.threshold)/span));
+
+  return {rank,percent:progress*100,nextThreshold:next.threshold};
+}
+
+function renderProfile(){
+  const loggedIn=!!state.user && !!state.profile;
+
+  $("profileLoginCard").classList.toggle("hidden",loggedIn);
+  $("profileShell").classList.toggle("hidden",!loggedIn);
+
+  if(!loggedIn){
+    updateOwnerField();
+    return;
+  }
+
+  const name=state.profile.username || currentUsername();
+  const roblox=currentUsername();
+  const games=integer(state.profile.games_played);
+  const wins=integer(state.profile.games_won);
+  const winrate=Number.isFinite(state.profile.win_rate)
+    ? state.profile.win_rate
+    : (games>0 ? wins/games*100 : 0);
+  const wagered=integer(state.profile.wagered_gems);
+  const rank=rankInfo(wagered);
+
+  renderAvatar($("profileAvatar"),state.profile.avatar_url,roblox);
+
+  $("profileName").textContent=name;
+  $("profileVerifiedTag").textContent=isVerified() ? "✓ Roblox verified" : "○ Roblox pending";
+  $("profileRankTag").textContent=`🏆 Rang ${rank.rank}`;
+  $("profileRobloxTag").textContent=`Roblox: ${roblox || "–"}`;
+
+  $("profileGems").textContent=formatNumber(currentGems());
+  $("profileGames").textContent=formatNumber(games);
+  $("profileWins").textContent=formatNumber(wins);
+  $("profileWinRate").textContent=formatPercent(winrate);
+  $("profileWagered").textContent=formatNumber(wagered);
+
+  $("profileRankBadge").textContent=String(rank.rank);
+  $("profileRankName").textContent=`Rang ${rank.rank}`;
+  $("profileRankPercent").textContent=`${Math.round(rank.percent)}%`;
+  $("profileRankProgress").style.width=`${rank.percent}%`;
+
+  $("profileRankText").textContent=rank.nextThreshold
+    ? `${formatNumber(wagered)} / ${formatNumber(rank.nextThreshold)} wagered Gems`
+    : `${formatNumber(wagered)} wagered Gems · Max Rank`;
+
+  $("profileUsernameInput").value=name;
+  renderProfileInventoryPreview();
+}
+
+async function saveProfile(){
+  if(!isAuthenticated())return;
+
+  const username=clean($("profileUsernameInput").value);
+
+  if(username.length<3 || username.length>24){
+    showToast("Der Anzeigename muss 3 bis 24 Zeichen haben.");
+    return;
+  }
+
+  try{
+    await rpcFallback(
+      ["neondice_update_username","update_profile_username"],
+      [{p_username:username},{username}]
+    );
+
+    await loadProfile();
+    showToast("Profil gespeichert.");
+  }catch(error){
+    showToast(normalizeError(error));
+  }
+}
+
+async function logout(){
+  await db.auth.signOut();
+
+  state.session=null;
+  state.user=null;
+  state.profile=null;
+  state.inventory=[];
+  state.selectedItems.clear();
+  state.currentGame=null;
+  state.upgradeItemId=null;
+  state.upgradeTargetId=null;
+
+  renderProfile();
+  renderInventory();
+  renderCreateInventory();
+  renderUpgrader();
+  updateTopProfile();
+  updateGemDisplays();
+
+  showPage("profile");
+  showToast("Abgemeldet.");
+}
+
+function updateOwnerField(){
+  const username=clean($("robloxUsername").value);
+  const owner=username.toLowerCase()===CONFIG.ownerUsername.toLowerCase();
+
+  $("ownerUidWrap").classList.toggle("hidden",!owner);
+
+  if(!owner)$("ownerUid").value="";
+}
+
+async function generateRobloxCode(){
+  if(state.busy.login)return;
+
+  const username=clean($("robloxUsername").value);
+  const owner=username.toLowerCase()===CONFIG.ownerUsername.toLowerCase();
+  const ownerUid=clean($("ownerUid").value);
+
+  if(!username){
+    $("loginStatus").textContent="Bitte zuerst den Roblox-Benutzernamen eingeben.";
+    return;
+  }
+
+  if(owner && !ownerUid){
+    $("loginStatus").textContent="Für das Owner-Konto muss die Supabase-UID eingegeben werden.";
+    return;
+  }
+
+  state.busy.login=true;
+  $("generateCodeButton").disabled=true;
+  $("loginStatus").textContent="Code wird serverseitig erzeugt…";
+
+  try{
+    const data=await callPublicEdge(CONFIG.edgeCode,{
+      username,
+      roblox_username:username,
+      owner_uid:owner ? ownerUid : null
+    });
+
+    const code=clean(data.code || data.challenge_code || data.verification_code).toUpperCase();
+    const challengeId=data.challenge_id || data.challengeId || data.id || "";
+
+    if(!/^[A-Z]{10}$/.test(code)){
+      throw new Error("Der Server hat keinen gültigen 10-Buchstaben-Code zurückgegeben.");
+    }
+
+    state.code=code;
+    state.challengeId=String(challengeId || "");
+    state.codeUsername=username;
+
+    $("verificationCode").value=code;
+    $("codeWrap").classList.remove("hidden");
+    $("verifyRobloxButton").classList.remove("hidden");
+    $("loginStatus").textContent="Code erzeugt. Kopiere ihn in deine Roblox-Bio.";
+
+    showToast("Roblox-Code erzeugt.");
+  }catch(error){
+    console.error("generateRobloxCode",error);
+    $("loginStatus").textContent=normalizeError(error);
+  }finally{
+    state.busy.login=false;
+    $("generateCodeButton").disabled=false;
+  }
+}
+
+async function copyVerificationCode(){
+  const code=clean($("verificationCode").value);
+  if(!code)return;
+
+  try{
+    await navigator.clipboard.writeText(code);
+  }catch{
+    $("verificationCode").focus();
+    $("verificationCode").select();
+    document.execCommand("copy");
+  }
+
+  showToast("Code kopiert.");
+}
+
+async function verifyRobloxBio(){
+  if(state.busy.login)return;
+
+  const username=clean($("robloxUsername").value);
+  const code=state.code || clean($("verificationCode").value).toUpperCase();
+  const owner=username.toLowerCase()===CONFIG.ownerUsername.toLowerCase();
+  const ownerUid=clean($("ownerUid").value);
+
+  if(!username || !code){
+    $("loginStatus").textContent="Erzeuge zuerst einen Code.";
+    return;
+  }
+
+  if(clean(state.codeUsername).toLowerCase()!==username.toLowerCase()){
+    $("loginStatus").textContent="Der Benutzername wurde geändert. Erzeuge bitte einen neuen Code.";
+    return;
+  }
+
+  state.busy.login=true;
+  $("verifyRobloxButton").disabled=true;
+  $("loginStatus").textContent="Roblox-Bio wird geprüft…";
+
+  try{
+    const data=await callPublicEdge(CONFIG.edgeLogin,{
+      username,
+      roblox_username:username,
+      code,
+      challenge_id:state.challengeId || null,
+      owner_uid:owner ? ownerUid : null
+    });
+
+    if(data.session?.access_token && data.session?.refresh_token){
+      const setResult=await db.auth.setSession({
+        access_token:data.session.access_token,
+        refresh_token:data.session.refresh_token
+      });
+
+      if(setResult.error)throw setResult.error;
+    }else if(data.access_token && data.refresh_token){
+      const setResult=await db.auth.setSession({
+        access_token:data.access_token,
+        refresh_token:data.refresh_token
+      });
+
+      if(setResult.error)throw setResult.error;
+    }else if(data.email && data.password){
+      const signIn=await db.auth.signInWithPassword({
+        email:data.email,
+        password:data.password
+      });
+
+      if(signIn.error)throw signIn.error;
+    }else{
+      const existing=await db.auth.getSession();
+      if(!existing.data.session){
+        throw new Error("Roblox wurde bestätigt, aber Supabase hat keine gültige Login-Session zurückgegeben.");
+      }
+    }
+
+    await loadSession();
+    await Promise.allSettled([loadProfile(),loadInventory(),loadGames(),loadMessages(),loadUpgradeTargets()]);
+
+    state.code="";
+    state.challengeId="";
+    state.codeUsername="";
+
+    $("codeWrap").classList.add("hidden");
+    $("verifyRobloxButton").classList.add("hidden");
+    $("loginStatus").textContent="✓ Erfolgreich angemeldet.";
+
+    showToast(`Willkommen, ${currentUsername()}!`);
+    showPage("profile");
+  }catch(error){
+    console.error("verifyRobloxBio",error);
+    $("loginStatus").textContent=normalizeError(error);
+  }finally{
+    state.busy.login=false;
+    $("verifyRobloxButton").disabled=false;
+  }
+}
+
+function normalizeInventory(row,index){
+  return {
+    raw:row,
+    id:row.id ?? row.inventory_id ?? row.item_id ?? `item-${index}`,
+    item_id:row.item_id ?? row.catalog_item_id ?? row.id ?? null,
+    item_name:row.item_name ?? row.name ?? row.pet_name ?? "Huge",
+    quantity:Math.max(1,integer(row.quantity ?? row.count ?? 1,1)),
+    gem_value:Math.max(0,integer(row.gem_value ?? row.value ?? row.item_value ?? 0)),
+    variant:row.variant ?? row.rarity ?? "Huge"
+  };
+}
+
+function legacyCurrencyItem(item){
+  return ["spielpunkte","game points","game_points","gems","gem"].includes(clean(item.item_name).toLowerCase());
+}
+
+async function loadInventory(){
+  if(!isAuthenticated()){
+    state.inventory=[];
+    renderInventory();
+    renderCreateInventory();
+    renderUpgrader();
+    return;
+  }
+
+  let data=null;
+
+  const rpc=await db.rpc("get_my_inventory_v2");
+
+  if(!rpc.error && Array.isArray(rpc.data)){
+    data=rpc.data;
+  }
+
+  if(!data){
+    const direct=await db.from("inventory").select("*").eq("user_id",state.user.id).order("created_at",{ascending:false});
+
+    if(direct.error){
+      console.error("loadInventory",direct.error);
+      state.inventory=[];
+      showToast(normalizeError(direct.error));
+    }else{
+      data=direct.data || [];
+    }
+  }
+
+  state.inventory=(data || []).map(normalizeInventory).filter(item=>!legacyCurrencyItem(item));
+
+  const validIds=new Set(state.inventory.map(item=>String(item.id)));
+
+  for(const id of [...state.selectedItems]){
+    if(!validIds.has(String(id)))state.selectedItems.delete(id);
+  }
+
+  if(state.upgradeItemId && !validIds.has(String(state.upgradeItemId))){
+    state.upgradeItemId=null;
+  }
+
+  renderInventory();
+  renderCreateInventory();
+  renderProfileInventoryPreview();
+  renderUpgrader();
+}
+
+function renderInventory(){
+  const box=$("inventory");
+  if(!box)return;
+
+  if(!state.inventory.length){
+    box.innerHTML=`<div class="item"><div class="item-name">🎒 Keine Items</div><div class="small">Dein Inventar enthält aktuell keine verfügbaren Huges.</div></div>`;
+    return;
+  }
+
+  box.innerHTML=state.inventory.map(item=>`
+    <div class="item">
+      <div class="item-head">
+        <div class="item-name">
+          <span class="item-icon">🐱</span>
+          <span>${esc(item.item_name)}</span>
+        </div>
+      </div>
+
+      <div class="small" style="margin-top:10px">Menge: ${formatNumber(item.quantity)}</div>
+      <div class="small">Gem-Wert: ${formatNumber(item.gem_value)}</div>
+      <div class="small">${esc(item.variant)}</div>
+    </div>
+  `).join("");
+}
+
+function renderCreateInventory(){
+  const box=$("createInventory");
+  if(!box)return;
+
+  if(!state.inventory.length){
+    box.innerHTML=`<div class="item"><div class="item-name">🎒 Keine Huges verfügbar</div><div class="small">Es wurden keine verfügbaren Inventar-Items gefunden.</div></div>`;
+    updateCreateSummary();
+    return;
+  }
+
+  box.innerHTML="";
+
+  state.inventory.forEach(item=>{
+    const id=String(item.id);
+    const selected=state.selectedItems.has(id);
+    const card=document.createElement("div");
+
+    card.className=`item ${selected ? "selected" : ""}`;
+
+    card.innerHTML=`
+      <div class="item-head">
+        <div class="item-name">
+          <span class="item-icon">🐱</span>
+          <span>${esc(item.item_name)}</span>
+        </div>
+        <input class="check" type="checkbox" ${selected ? "checked" : ""} aria-label="${esc(item.item_name)}">
+      </div>
+
+      <div class="small" style="margin-top:10px">Menge: ${formatNumber(item.quantity)}</div>
+      <div class="small">Gem-Wert: ${formatNumber(item.gem_value)}</div>
+    `;
+
+    const checkbox=card.querySelector("input");
+
+    checkbox.addEventListener("click",event=>event.stopPropagation());
+
+    checkbox.addEventListener("change",()=>{
+      toggleSelectedItem(id);
+    });
+
+    card.addEventListener("click",event=>{
+      if(event.target===checkbox)return;
+      toggleSelectedItem(id);
+    });
+
+    box.appendChild(card);
+  });
+
+  updateCreateSummary();
+}
+
+function toggleSelectedItem(id){
+  if(state.selectedItems.has(id)){
+    state.selectedItems.delete(id);
+  }else{
+    state.selectedItems.add(id);
+  }
+  renderCreateInventory();
+}
+
+function selectAllItems(){
+  state.selectedItems.clear();
+  state.inventory.forEach(item=>state.selectedItems.add(String(item.id)));
+  renderCreateInventory();
+}
+
+function clearSelectedItems(){
+  state.selectedItems.clear();
+  renderCreateInventory();
+}
+
+function updateCreateSummary(){
+  $("createSummary").textContent=state.selectedItems.size
+    ? `${state.selectedItems.size} Huge(s) ausgewählt.`
+    : "Noch keine Items ausgewählt.";
+}
+
+async function createMatch(){
+  if(!isAuthenticated()){
+    showPage("profile");
+    return;
+  }
+
+  if(!isVerified()){
+    showToast("Bitte zuerst Roblox verifizieren.");
+    showPage("profile");
+    return;
+  }
+
+  if(state.busy.create)return;
+
+  const selectedIds=[...state.selectedItems]
+    .map(value=>Number(value))
+    .filter(Number.isFinite);
+
+  const stake=Math.floor(number($("gemStakeInput").value));
+
+  $("createError").classList.add("hidden");
+
+  if(!selectedIds.length){
+    $("createError").textContent="Wähle mindestens ein Huge aus.";
+    $("createError").classList.remove("hidden");
+    return;
+  }
+
+  if(!Number.isFinite(stake) || stake<1){
+    $("createError").textContent="Der Gem-Einsatz muss mindestens 1 sein.";
+    $("createError").classList.remove("hidden");
+    return;
+  }
+
+  if(stake>currentGems()){
+    $("createError").textContent="Du hast nicht genügend Gems.";
+    $("createError").classList.remove("hidden");
+    return;
+  }
+
+  state.busy.create=true;
+  $("createMatchButton").disabled=true;
+
+  try{
+    const result=await rpcFallback(
+      ["neondice_create_match","create_dice_game","create_game"],
+      [
+        {p_stake:stake,p_inventory_ids:selectedIds},
+        {p_gems:stake,p_inventory_ids:selectedIds},
+        {p_gem_stake:stake,p_inventory_ids:selectedIds}
+      ]
+    );
+
+    const row=Array.isArray(result.data) ? result.data[0] : result.data;
+
+    state.currentGame=row || null;
+    state.selectedItems.clear();
+    $("gemStakeInput").value="1";
+
+    await Promise.allSettled([loadProfile(),loadInventory(),loadGames()]);
+
+    if(row)renderGame(row);
+
+    showToast("Match wurde erstellt.");
+    showPage("dice");
+  }catch(error){
+    console.error("createMatch",error);
+    $("createError").textContent=normalizeError(error);
+    $("createError").classList.remove("hidden");
+  }finally{
+    state.busy.create=false;
+    $("createMatchButton").disabled=false;
+  }
+}
+
+async function loadGames(){
+  const box=$("games");
+  box.innerHTML=`<div class="small">Spiele werden geladen…</div>`;
+
+  const {data,error}=await db.from("games").select("*").order("created_at",{ascending:false}).limit(50);
+
+  if(error){
+    box.innerHTML=`<div class="notice bad">${esc(normalizeError(error))}</div>`;
+    return;
+  }
+
+  state.games=Array.isArray(data) ? data : [];
+  renderGames();
+}
+
+function renderGames(){
+  const box=$("games");
+  if(!box)return;
+
+  const visible=state.games.filter(game=>String(game.status||"open").toLowerCase()!=="cancelled");
+
+  if(!visible.length){
+    box.innerHTML=`<div class="small">Noch keine Spiele vorhanden.</div>`;
+    return;
+  }
+
+  box.innerHTML="";
+
+  visible.forEach(game=>{
+    const stake=number(game.creator_stake ?? game.stake_gems ?? game.stake ?? 0);
+    const p1=game.player1_name || game.creator_name || "Spieler";
+    const p2=game.player2_name || game.joiner_name || "Wartet…";
+    const status=String(game.status || "open").toLowerCase();
+
+    const card=document.createElement("div");
+    card.className="card game";
+
+    card.innerHTML=`
+      <div>
+        <h3>🎲 ${esc(game.name || "NeonDice Match")}</h3>
+        <div class="game-meta">${esc(p1)} vs ${esc(p2)}</div>
+        <div class="small" style="margin-top:6px">💎 ${formatNumber(stake)} Gems</div>
+        <span class="status-pill">${esc(status)}</span>
+      </div>
+      <div class="actions"></div>
+    `;
+
+    const actions=card.querySelector(".actions");
+
+    if(status==="open" && !game.player2_id){
+      const join=document.createElement("button");
+      join.className="btn smallbtn";
+      join.textContent="Beitreten";
+      join.onclick=()=>joinGame(game);
+      actions.appendChild(join);
+    }
+
+    const open=document.createElement("button");
+    open.className="btn secondary smallbtn";
+    open.textContent="Öffnen";
+    open.onclick=()=>{
+      state.currentGame=game;
+      renderGame(game);
+      showPage("dice");
+    };
+    actions.appendChild(open);
+
+    box.appendChild(card);
+  });
+}
+
+async function joinGame(game){
+  if(!isAuthenticated()){
+    showPage("profile");
+    return;
+  }
+
+  if(!isVerified()){
+    showToast("Bitte zuerst Roblox verifizieren.");
+    showPage("profile");
+    return;
+  }
+
+  if(state.busy.join)return;
+
+  const creatorStake=number(game.creator_stake ?? game.stake_gems ?? game.stake ?? 0);
+  const minStake=Math.ceil(creatorStake*.95);
+  const maxStake=Math.floor(creatorStake*1.10);
+  const suggested=Math.max(minStake,Math.min(maxStake,currentGems()));
+
+  if(suggested<minStake){
+    showToast(`Du benötigst mindestens ${formatNumber(minStake)} Gems.`);
+    return;
+  }
+
+  state.busy.join=true;
+
+  try{
+    const result=await rpcFallback(
+      ["neondice_join_gem_game","neondice_join_match","join_dice_game","join_game"],
+      [
+        {p_game_id:game.id,p_stake:suggested},
+        {p_game_id:game.id},
+        {p_match_id:game.id,p_stake:suggested}
+      ]
+    );
+
+    const row=Array.isArray(result.data) ? result.data[0] : result.data;
+
+    state.currentGame=row || game;
+
+    await Promise.allSettled([loadProfile(),loadGames()]);
+    renderGame(state.currentGame);
+    showToast("Match beigetreten.");
+  }catch(error){
+    console.error("joinGame",error);
+    showToast(normalizeError(error));
+  }finally{
+    state.busy.join=false;
+  }
+}
+
+function setDie(id,value){
+  const el=$(id);
+  el.textContent=value==null ? "?" : String(value);
+  el.classList.toggle("rolled",value!=null);
+}
+
+function renderGame(game){
+  if(!game)return;
+
+  state.currentGame=game;
+
+  const p1=game.player1_name || game.creator_name || "Ersteller";
+  const p2=game.player2_name || game.joiner_name || "Wartet…";
+
+  $("player1Name").textContent=p1;
+  $("player2Name").textContent=p2;
+  renderAvatar($("player1Avatar"),"",p1);
+  renderAvatar($("player2Avatar"),"",p2);
+
+  setDie("p1d1",game.player1_die1);
+  setDie("p1d2",game.player1_die2);
+  setDie("p2d1",game.player2_die1);
+  setDie("p2d2",game.player2_die2);
+
+  $("p1sum").textContent=game.player1_total!=null ? `Summe: ${game.player1_total}` : "–";
+  $("p2sum").textContent=game.player2_total!=null ? `Summe: ${game.player2_total}` : "–";
+
+  $("rollGameButton").classList.add("hidden");
+  $("cancelGameButton").classList.add("hidden");
+
+  const status=String(game.status || "open").toLowerCase();
+
+  if(status==="open"){
+    $("gameResult").textContent="Das Match wartet auf einen zweiten Spieler.";
+
+    if(isAuthenticated() && game.player1_id===state.user.id){
+      $("cancelGameButton").classList.remove("hidden");
+    }
+
+    return;
+  }
+
+  if(status==="ready"){
+    $("gameResult").textContent="Beide Spieler sind bereit. Der Wurf wird serverseitig ausgewertet.";
+
+    if(
+      isAuthenticated() &&
+      (game.player1_id===state.user.id || game.player2_id===state.user.id)
+    ){
+      $("rollGameButton").classList.remove("hidden");
+    }
+
+    return;
+  }
+
+  if(status==="finished"){
+    let winner="Unentschieden";
+
+    if(["creator","player1"].includes(String(game.winner))){
+      winner=game.player1_name || "Ersteller";
+    }
+
+    if(["joiner","player2"].includes(String(game.winner))){
+      winner=game.player2_name || "Spieler 2";
+    }
+
+    if(String(game.winner)==="draw")winner="Unentschieden";
+
+    $("gameResult").innerHTML=`
+      <div class="winner">🏆 ${esc(winner)}</div>
+      <div class="small" style="margin-top:8px">
+        Pot: ${formatNumber(game.pot || 0)} · Auszahlung: ${formatNumber(game.payout || 0)}
+      </div>
+    `;
+    return;
+  }
+
+  $("gameResult").textContent=`Status: ${status}`;
+}
+
+async function rollCurrentGame(){
+  if(!state.currentGame?.id || state.busy.roll)return;
+
+  state.busy.roll=true;
+  $("rollGameButton").disabled=true;
+
+  try{
+    const result=await rpcFallback(
+      ["neondice_finish_gem_game","neondice_finish_match","finish_dice_game","finish_game"],
+      [
+        {p_game_id:state.currentGame.id},
+        {p_match_id:state.currentGame.id}
+      ]
+    );
+
+    const row=Array.isArray(result.data) ? result.data[0] : result.data;
+
+    if(row){
+      state.currentGame=row;
+      renderGame(row);
+    }
+
+    await Promise.allSettled([loadProfile(),loadInventory(),loadGames()]);
+    showToast("Würfel wurden serverseitig ausgewertet.");
+  }catch(error){
+    showToast(normalizeError(error));
+  }finally{
+    state.busy.roll=false;
+    $("rollGameButton").disabled=false;
+  }
+}
+
+async function cancelCurrentGame(){
+  if(!state.currentGame?.id)return;
+
+  try{
+    const result=await rpcFallback(
+      ["neondice_cancel_gem_game","cancel_dice_game","cancel_game"],
+      [{p_game_id:state.currentGame.id},{p_match_id:state.currentGame.id}]
+    );
+
+    const row=Array.isArray(result.data) ? result.data[0] : result.data;
+
+    if(row){
+      state.currentGame=row;
+      renderGame(row);
+    }
+
+    await Promise.allSettled([loadProfile(),loadInventory(),loadGames()]);
+    showToast("Match wurde abgebrochen.");
+  }catch(error){
+    showToast(normalizeError(error));
+  }
+}
+
+async function loadHistory(){
+  if(!isAuthenticated()){
+    $("profileHistory").innerHTML=`<div class="small">Bitte zuerst anmelden.</div>`;
+    return;
+  }
+
+  const {data,error}=await db
+    .from("games")
+    .select("*")
+    .or(`player1_id.eq.${state.user.id},player2_id.eq.${state.user.id}`)
+    .eq("status","finished")
+    .order("created_at",{ascending:false})
+    .limit(30);
+
+  if(error){
+    $("profileHistory").innerHTML=`<div class="small">${esc(normalizeError(error))}</div>`;
+    return;
+  }
+
+  if(!data?.length){
+    $("profileHistory").innerHTML=`<div class="small">Noch keine beendeten Spiele.</div>`;
+    return;
+  }
+
+  $("profileHistory").innerHTML=data.map(game=>{
+    const p1=game.player1_name || "Spieler";
+    const p2=game.player2_name || "Spieler";
+    const isP1=game.player1_id===state.user.id;
+    const won=
+      (["creator","player1"].includes(String(game.winner)) && isP1) ||
+      (["joiner","player2"].includes(String(game.winner)) && !isP1);
+
+    return `
+      <div class="history-row">
+        <div>
+          <strong>🎲 ${esc(game.name || "NeonDice Match")}</strong>
+          <div class="small">${esc(p1)} vs ${esc(p2)}</div>
+          <div class="small">💎 Pot: ${formatNumber(game.pot || 0)}</div>
+        </div>
+
+        <div class="profile-tag">${String(game.winner)==="draw" ? "Draw" : (won ? "✓ Win" : "Loss")}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderProfileInventoryPreview(){
+  const box=$("profileInventoryPreview");
+  if(!box)return;
+
+  if(!state.inventory.length){
+    box.innerHTML=`<div class="small">Keine Items.</div>`;
+    return;
+  }
+
+  box.innerHTML=state.inventory.slice(0,4).map(item=>`
+    <div class="item">
+      <div class="item-name"><span class="item-icon">🐱</span>${esc(item.item_name)}</div>
+      <div class="small" style="margin-top:7px">×${formatNumber(item.quantity)}</div>
+    </div>
+  `).join("");
+}
+
+async function loadUpgradeTargets(){
+  const candidates=[
+    ["upgrader_targets",{active:true}],
+    ["pet_catalog",{is_upgrader_target:true}],
+    ["item_catalog",{is_upgrader_target:true}]
+  ];
+
+  let targets=[];
+
+  for(const [table,filter] of candidates){
+    let query=db.from(table).select("*").limit(100);
+
+    for(const [key,value] of Object.entries(filter)){
+      query=query.eq(key,value);
+    }
+
+    const {data,error}=await query;
+
+    if(!error && Array.isArray(data) && data.length){
+      targets=data;
+      break;
+    }
+  }
+
+  state.targets=targets.map((row,index)=>({
+    raw:row,
+    id:row.id ?? row.pet_id ?? row.item_id ?? `target-${index}`,
+    name:row.pet_name ?? row.item_name ?? row.name ?? "Target Pet",
+    gem_value:Math.max(0,integer(row.gem_value ?? row.value ?? 0))
+  }));
+
+  if(state.upgradeTargetId && !state.targets.some(target=>String(target.id)===String(state.upgradeTargetId))){
+    state.upgradeTargetId=null;
+  }
+
+  renderUpgrader();
+}
+
+function renderUpgrader(){
+  const sourceBox=$("upgradeSourceList");
+  const targetBox=$("upgradeTargetList");
+
+  if(!sourceBox || !targetBox)return;
+
+  sourceBox.innerHTML="";
+
+  if(!state.inventory.length){
+    sourceBox.innerHTML=`<div class="small">Keine Items vorhanden.</div>`;
+  }else{
+    state.inventory.forEach(item=>{
+      const selected=String(state.upgradeItemId)===String(item.id);
+      const row=document.createElement("div");
+
+      row.className=`choice ${selected ? "selected" : ""}`;
+
+      row.innerHTML=`
+        <div class="choice-icon">🐱</div>
+        <div>
+          <strong>${esc(item.item_name)}</strong>
+          <div class="small">${formatNumber(item.gem_value)} Gems · ×${formatNumber(item.quantity)}</div>
+        </div>
+      `;
+
+      const button=document.createElement("button");
+      button.type="button";
+      button.className="btn secondary smallbtn";
+      button.textContent=selected ? "✓" : "Wählen";
+      button.onclick=()=>{
+        state.upgradeItemId=item.id;
+        renderUpgrader();
+      };
+
+      row.appendChild(button);
+      sourceBox.appendChild(row);
+    });
+  }
+
+  targetBox.innerHTML="";
+
+  if(!state.targets.length){
+    targetBox.innerHTML=`<div class="small">Keine Upgrader-Ziel-Pets in Supabase gefunden.</div>`;
+  }else{
+    state.targets.forEach(target=>{
+      const selected=String(state.upgradeTargetId)===String(target.id);
+      const row=document.createElement("div");
+
+      row.className=`choice ${selected ? "selected" : ""}`;
+
+      row.innerHTML=`
+        <div class="choice-icon">🐱</div>
+        <div>
+          <strong>${esc(target.name)}</strong>
+          <div class="small">${target.gem_value ? `${formatNumber(target.gem_value)} Gems` : "Target Pet"}</div>
+        </div>
+      `;
+
+      const button=document.createElement("button");
+      button.type="button";
+      button.className="btn secondary smallbtn";
+      button.textContent=selected ? "✓" : "Wählen";
+      button.onclick=()=>{
+        state.upgradeTargetId=target.id;
+        renderUpgrader();
+      };
+
+      row.appendChild(button);
+      targetBox.appendChild(row);
+    });
+  }
+
+  const source=state.inventory.find(item=>String(item.id)===String(state.upgradeItemId));
+  const target=state.targets.find(item=>String(item.id)===String(state.upgradeTargetId));
+
+  $("upgradeSelectionSummary").textContent=
+    source && target
+      ? `${source.item_name} → ${target.name}`
+      : "Wähle ein eigenes Item und ein Ziel-Pet.";
+}
+
+function animateUpgrade(serverWin){
+  const base=1440;
+  const visualAngle=serverWin
+    ? 30 + Math.floor(Math.random()*105)
+    : 195 + Math.floor(Math.random()*130);
+
+  $("upgradeNeedle").style.transform=`rotate(${base+visualAngle}deg)`;
+}
+
+async function runUpgrade(){
+  if(!isAuthenticated()){
+    showPage("profile");
+    return;
+  }
+
+  if(!state.upgradeItemId || !state.upgradeTargetId){
+    showToast("Wähle zuerst ein Item und ein Ziel-Pet.");
+    return;
+  }
+
+  if(state.busy.upgrade)return;
+
+  state.busy.upgrade=true;
+  $("startUpgradeButton").disabled=true;
+  $("upgradeResult").textContent="Auslosung läuft…";
+  $("upgradeResult").style.color="";
+
+  try{
+    const target=state.targets.find(item=>String(item.id)===String(state.upgradeTargetId));
+
+    const result=await rpcFallback(
+      ["neondice_play_upgrade","play_upgrade","run_upgrader"],
+      [
+        {p_inventory_id:Number(state.upgradeItemId),p_target_pet_id:state.upgradeTargetId},
+        {p_item_id:Number(state.upgradeItemId),p_target_id:state.upgradeTargetId},
+        {p_inventory_id:Number(state.upgradeItemId),p_target_pet:target?.name || String(state.upgradeTargetId)}
+      ]
+    );
+
+    const data=Array.isArray(result.data) ? (result.data[0] || {}) : (result.data || {});
+
+    const serverWin=Boolean(data.won ?? data.win ?? data.is_win ?? false);
+
+    animateUpgrade(serverWin);
+
+    setTimeout(()=>{
+      $("upgradeResult").textContent=serverWin ? "GEWINN · 45 %" : "VERLOREN · 55 %";
+      $("upgradeResult").style.color=serverWin ? "var(--good)" : "var(--danger)";
+    },2850);
+
+    setTimeout(()=>{
+      Promise.allSettled([loadInventory(),loadProfile()]);
+    },3000);
+  }catch(error){
+    console.error("runUpgrade",error);
+    $("upgradeResult").textContent=normalizeError(error);
+    $("upgradeResult").style.color="var(--danger)";
+  }finally{
+    setTimeout(()=>{
+      state.busy.upgrade=false;
+      $("startUpgradeButton").disabled=false;
+    },3000);
+  }
+}
+
+async function loadMessages(){
+  const {data,error}=await db
+    .from("public_chat_messages")
+    .select("*")
+    .order("created_at",{ascending:true})
+    .limit(150);
+
+  if(error){
+    console.error("loadMessages",error);
+    state.messages=[];
+    renderMessages(normalizeError(error));
+    return;
+  }
+
+  state.messages=Array.isArray(data) ? data : [];
+  renderMessages();
+}
+
+function normalizeMessage(row){
+  return {
+    id:row.id,
+    user_id:row.user_id || row.profile_id || null,
+    username:row.username || row.roblox_username || row.user_name || "Spieler",
+    content:row.content || row.message || row.text || "",
+    created_at:row.created_at || new Date().toISOString()
+  };
+}
+
+function renderMessages(errorMessage=""){
+  for(const box of [$("sideMessages"),$("pageMessages")]){
+    if(!box)continue;
+
+    if(errorMessage){
+      box.innerHTML=`<div class="notice bad">${esc(errorMessage)}</div>`;
+      continue;
+    }
+
+    if(!state.messages.length){
+      box.innerHTML=`<div class="small">Noch keine Nachrichten.</div>`;
+      continue;
+    }
+
+    box.innerHTML="";
+
+    state.messages.map(normalizeMessage).forEach(message=>{
+      const row=document.createElement("div");
+      row.className="message";
+
+      const user=document.createElement("button");
+      user.type="button";
+      user.className="message-user";
+      user.textContent=message.username;
+      user.onclick=()=>openUserProfile(message);
+
+      const text=document.createElement("p");
+      text.textContent=message.content;
+
+      row.append(user,text);
+      box.appendChild(row);
+    });
+
+    box.scrollTop=box.scrollHeight;
+  }
+}
+
+async function sendChatMessage(inputId){
+  if(!isAuthenticated()){
+    showPage("profile");
+    showToast("Bitte zuerst Roblox anmelden.");
+    return;
+  }
+
+  if(state.busy.chat)return;
+
+  const input=$(inputId);
+  const content=clean(input.value);
+
+  if(!content)return;
+
+  state.busy.chat=true;
+
+  try{
+    const result=await rpcFallback(
+      ["send_public_chat_message","send_chat_message"],
+      [{p_content:content},{p_message:content}]
+    );
+
+    input.value="";
+
+    const row=Array.isArray(result.data) ? result.data[0] : result.data;
+
+    if(row && row.id && !state.messages.some(message=>String(message.id)===String(row.id))){
+      state.messages.push(row);
+      renderMessages();
+    }else{
+      await loadMessages();
+    }
+  }catch(error){
+    showToast(normalizeError(error));
+  }finally{
+    state.busy.chat=false;
+  }
+}
+
+async function loadPublicProfile(userId,username){
+  const attempts=[
+    ["public_profiles_safe","user_id",userId],
+    ["public_profiles_safe","id",userId],
+    ["public_profiles_safe","roblox_username",username],
+    ["profiles","id",userId]
+  ];
+
+  for(const [table,column,value] of attempts){
+    if(value==null || value==="")continue;
+
+    const {data,error}=await db.from(table).select("*").eq(column,value).maybeSingle();
+
+    if(!error && data)return normalizeProfile(data);
+  }
+
+  return normalizeProfile({id:userId,roblox_username:username,username});
+}
+
+async function openUserProfile(message){
+  const normalized=normalizeMessage(message);
+
+  $("userModalTitle").textContent=normalized.username;
+  $("userModalBody").innerHTML=`<div class="small">Profil wird geladen…</div>`;
+  $("userModalBackdrop").classList.remove("hidden");
+
+  try{
+    const profile=await loadPublicProfile(normalized.user_id,normalized.username);
+    renderUserModal(profile,normalized);
+  }catch(error){
+    $("userModalBody").innerHTML=`<div class="notice bad">${esc(normalizeError(error))}</div>`;
+  }
+}
+
+function renderUserModal(profile,message){
+  const name=profile?.roblox_username || profile?.username || message.username;
+  const games=integer(profile?.games_played);
+  const wins=integer(profile?.games_won);
+  const rate=games ? wins/games*100 : 0;
+  const rank=rankInfo(integer(profile?.wagered_gems));
+  const recipientId=profile?.id || profile?.user_id || message.user_id;
+
+  $("userModalBody").innerHTML=`
+    <div style="display:flex;gap:14px;align-items:center;margin-top:10px">
+      <div class="avatar" id="modalAvatar">?</div>
+      <div>
+        <h3 style="margin:0">${esc(name)}</h3>
+        <div class="profile-tags">
+          <span class="profile-tag">🏆 Rang ${rank.rank}</span>
+          <span class="profile-tag">🎮 ${formatNumber(games)} Games</span>
+          <span class="profile-tag">✓ ${formatPercent(rate)} Winrate</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>🎁 Item schenken</h3>
+    <div id="giftList" class="gift-list"></div>
+  `;
+
+  renderAvatar($("modalAvatar"),profile?.avatar_url || "",name);
+
+  const list=$("giftList");
+
+  if(!isAuthenticated()){
+    list.innerHTML=`<div class="small">Bitte zuerst anmelden.</div>`;
+    return;
+  }
+
+  if(!state.inventory.length){
+    list.innerHTML=`<div class="small">Keine Items zum Schenken.</div>`;
+    return;
+  }
+
+  state.inventory.forEach(item=>{
+    const row=document.createElement("div");
+    row.className="gift-row";
+
+    row.innerHTML=`
+      <div class="choice-icon">🐱</div>
+      <div>
+        <strong>${esc(item.item_name)}</strong>
+        <div class="small">×${formatNumber(item.quantity)}</div>
+      </div>
+    `;
+
+    const button=document.createElement("button");
+    button.type="button";
+    button.className="btn smallbtn";
+    button.textContent="Schenken";
+    button.onclick=()=>giftItem(recipientId,name,item.id);
+
+    row.appendChild(button);
+    list.appendChild(row);
+  });
+}
+
+async function giftItem(recipientId,recipientName,inventoryId){
+  if(state.busy.gift)return;
+
+  if(recipientId && String(recipientId)===String(state.user?.id)){
+    showToast("Du kannst dir selbst nichts schenken.");
+    return;
+  }
+
+  state.busy.gift=true;
+
+  try{
+    await rpcFallback(
+      ["gift_inventory_item","gift_item"],
+      [
+        {p_receiver_user_id:recipientId,p_inventory_id:Number(inventoryId),p_quantity:1},
+        {p_recipient_id:recipientId,p_inventory_id:Number(inventoryId)},
+        {p_receiver_username:recipientName,p_item_id:Number(inventoryId)}
+      ]
+    );
+
+    await loadInventory();
+    $("userModalBackdrop").classList.add("hidden");
+    showToast(`Item an ${recipientName} geschenkt.`);
+  }catch(error){
+    showToast(normalizeError(error));
+  }finally{
+    state.busy.gift=false;
+  }
+}
+
+async function runDiagnostics(){
+  $("diagProject").textContent=CONFIG.projectRef;
+  $("diagKey").textContent=`${CONFIG.publishableKey.slice(0,18)}…`;
+  $("diagDataApi").textContent="Prüfe…";
+  $("diagAuth").textContent="Prüfe…";
+  $("diagChat").textContent="Prüfe…";
+  $("diagUpgrader").textContent=state.targets.length ? `✓ ${state.targets.length} Targets` : "○ keine Targets";
+
+  try{
+    const probe=await db.from("public_chat_messages").select("id").limit(1);
+
+    if(probe.error)throw probe.error;
+
+    $("diagDataApi").textContent="✓ erreichbar";
+    $("diagChat").textContent="✓ erreichbar";
+    setConnection("Supabase Online","ok");
+  }catch(error){
+    $("diagDataApi").textContent=`✗ ${normalizeError(error)}`;
+    $("diagChat").textContent="✗ Fehler";
+    setConnection("Supabase Data API Fehler","bad");
+  }
+
+  const session=await db.auth.getSession();
+
+  $("diagAuth").textContent=session.data.session?.user
+    ? "✓ Session vorhanden"
+    : "○ nicht angemeldet";
+}
+
+function subscribeRealtime(){
+  if(state.realtime){
+    db.removeChannel(state.realtime);
+  }
+
+  state.realtime=db
+    .channel("neondice-live-full-ui")
+
+    .on(
+      "postgres_changes",
+      {event:"*",schema:"public",table:"games"},
+      async payload=>{
+        if(payload.new && state.currentGame?.id===payload.new.id){
+          state.currentGame=payload.new;
+          renderGame(payload.new);
+        }
+        await loadGames();
+      }
+    )
+
+    .on(
+      "postgres_changes",
+      {event:"*",schema:"public",table:"profiles"},
+      async payload=>{
+        if(
+          state.user &&
+          (
+            payload.new?.id===state.user.id ||
+            payload.new?.user_id===state.user.id
+          )
+        ){
+          await loadProfile();
+        }
+      }
+    )
+
+    .on(
+      "postgres_changes",
+      {event:"INSERT",schema:"public",table:"chat_messages"},
+      async ()=>{
+        await loadMessages();
+      }
+    )
+
+    .subscribe();
+}
+
+function bindEvents(){
+  document.querySelectorAll(".nav button[data-page]").forEach(button=>{
+    button.addEventListener("click",()=>showPage(button.dataset.page));
+  });
+
+  document.querySelectorAll(".mobile-nav button[data-mobile-page]").forEach(button=>{
+    button.addEventListener("click",()=>showPage(button.dataset.mobilePage));
+  });
+
+  $("topProfileButton").onclick=()=>showPage("profile");
+  $("langBtn").onclick=toggleLanguage;
+  $("refreshGamesButton").onclick=loadGames;
+  $("refreshInventoryButton").onclick=loadInventory;
+  $("selectAllButton").onclick=selectAllItems;
+  $("clearAllButton").onclick=clearSelectedItems;
+  $("createMatchButton").onclick=createMatch;
+  $("refreshUpgraderButton").onclick=()=>Promise.allSettled([loadInventory(),loadUpgradeTargets()]);
+  $("startUpgradeButton").onclick=runUpgrade;
+  $("generateCodeButton").onclick=generateRobloxCode;
+  $("copyCodeButton").onclick=copyVerificationCode;
+  $("verifyRobloxButton").onclick=verifyRobloxBio;
+  $("robloxUsername").addEventListener("input",updateOwnerField);
+  $("refreshProfileButton").onclick=()=>Promise.allSettled([loadProfile(),loadInventory(),loadHistory()]);
+  $("saveProfileButton").onclick=saveProfile;
+  $("logoutButton").onclick=logout;
+  $("rollGameButton").onclick=rollCurrentGame;
+  $("cancelGameButton").onclick=cancelCurrentGame;
+  $("runDiagnosticsButton").onclick=runDiagnostics;
+
+  $("sideChatForm").addEventListener("submit",event=>{
+    event.preventDefault();
+    sendChatMessage("sideChatInput");
+  });
+
+  $("pageChatForm").addEventListener("submit",event=>{
+    event.preventDefault();
+    sendChatMessage("pageChatInput");
+  });
+
+  $("closeUserModalButton").onclick=()=>$("userModalBackdrop").classList.add("hidden");
+
+  $("userModalBackdrop").addEventListener("click",event=>{
+    if(event.target===$("userModalBackdrop")){
+      $("userModalBackdrop").classList.add("hidden");
+    }
+  });
+}
+
+db.auth.onAuthStateChange(async(event,session)=>{
+  state.session=session || null;
+  state.user=session?.user || null;
+
+  if(state.user){
+    await Promise.allSettled([loadProfile(),loadInventory(),loadHistory()]);
+  }else{
+    state.profile=null;
+    state.inventory=[];
+    state.selectedItems.clear();
+    renderProfile();
+    renderInventory();
+    renderCreateInventory();
+    renderUpgrader();
+    updateTopProfile();
+    updateGemDisplays();
+  }
+});
+
+async function boot(){
+  applyLanguage();
+  bindEvents();
+
+  setConnection("Supabase wird geprüft…");
+
+  renderInventory();
+  renderCreateInventory();
+  renderUpgrader();
+  renderProfile();
+
+  try{
+    await loadSession();
+    await runDiagnostics();
+
+    if(state.user){
+      await Promise.allSettled([loadProfile(),loadInventory(),loadHistory()]);
+    }
+
+    await Promise.allSettled([loadGames(),loadMessages(),loadUpgradeTargets()]);
+
+    updateTopProfile();
+    updateGemDisplays();
+    subscribeRealtime();
+
+    setConnection("Supabase Online","ok");
+  }catch(error){
+    console.error("boot",error);
+    setConnection("Supabase Fehler","bad");
+    showToast(normalizeError(error));
+  }
+
+  showPage("dice");
+}
+
+boot();
+</script>
+
+</body>
+</html>
