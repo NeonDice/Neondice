@@ -1,0 +1,1143 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090812">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>NeonDice</title>
+<style>
+:root{
+  --bg:#090812;--surface:#11101c;--surface2:#181426;--surface3:#211a34;
+  --line:rgba(139,92,246,.24);--line2:rgba(192,132,252,.42);
+  --text:#f5f3ff;--muted:#9a94ad;--purple:#8b5cf6;--purple2:#c084fc;
+  --blue:#5b78ff;--green:#34d399;--yellow:#fbbf24;--red:#fb7185;
+  --shadow:0 25px 70px rgba(0,0,0,.4);--r:18px;--font:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;color:var(--text);font-family:var(--font);background:
+radial-gradient(900px 460px at 12% -5%,rgba(139,92,246,.19),transparent 65%),
+radial-gradient(850px 430px at 90% 10%,rgba(192,132,252,.12),transparent 68%),
+linear-gradient(180deg,#0b0914,#080710);overflow-x:hidden}
+button,input,select{font:inherit}button{cursor:pointer}.hidden{display:none!important}.muted{color:var(--muted)}.small{font-size:12px}
+.app{display:grid;grid-template-columns:220px minmax(0,1fr) 310px;min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;padding:22px 14px;background:rgba(8,7,15,.96);border-right:1px solid var(--line)}
+.brand{margin:4px 10px 28px;font-size:23px;font-weight:950}.brand span{color:var(--purple2)}
+.nav{display:grid;gap:7px}.nav-title{margin:18px 10px 3px;color:#6d6680;font-size:10px;text-transform:uppercase;letter-spacing:1.2px;font-weight:900}
+.nav button{width:100%;padding:12px 13px;border:0;border-radius:12px;color:var(--muted);background:transparent;text-align:left}
+.nav button:hover,.nav button.active{color:#fff;background:rgba(139,92,246,.16);box-shadow:inset 0 0 0 1px rgba(139,92,246,.18)}
+main{min-width:0;padding:20px 25px 86px}.inner{width:min(1080px,100%);margin:auto}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:66px;margin-bottom:16px}
+.top h1{margin:0;font-size:22px}.top-sub{margin-top:3px;color:var(--muted);font-size:12px}
+.top-actions{display:flex;align-items:center;gap:8px}.pill{display:flex;align-items:center;gap:7px;padding:8px 11px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:12px;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--yellow)}.pill.ok{color:var(--green)}.pill.ok .dot{background:var(--green)}.pill.err{color:var(--red)}.pill.err .dot{background:var(--red)}
+.profile-chip{display:flex;align-items:center;gap:8px;padding:5px 10px 5px 6px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:#fff}
+.avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,var(--purple),var(--purple2))}
+.panel{display:none}.panel.active{display:block}.card{padding:20px;border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(145deg,rgba(24,21,38,.97),rgba(13,12,23,.99));box-shadow:var(--shadow);margin-bottom:16px}
+.card h2{margin:0 0 7px;font-size:19px}.card p{margin:0;color:var(--muted);line-height:1.5}
+.btn{min-height:42px;padding:10px 15px;border:1px solid transparent;border-radius:11px;color:#fff;background:#221d31;font-weight:850}.btn:hover{filter:brightness(1.08)}.btn:disabled{opacity:.5;cursor:wait}
+.primary{background:linear-gradient(135deg,var(--purple),#6d44d8)}.secondary{border-color:var(--line);background:var(--surface2)}.danger-btn{background:rgba(94,25,43,.65);border-color:rgba(251,113,133,.25)}
+.row{display:flex;gap:9px;flex-wrap:wrap}.input,.select{width:100%;min-height:44px;padding:11px 12px;border:1px solid var(--line);border-radius:11px;outline:none;color:#fff;background:#0e0d18}.input:focus,.select:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(139,92,246,.12)}
+.label{display:block;margin-bottom:6px;color:#d8d3e8;font-size:12px;font-weight:850}.divider{height:1px;background:var(--line);margin:18px 0}
+.dice-stage{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px;margin:35px 0}.player{text-align:center;min-width:0}.player img{width:64px;height:64px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,var(--purple),var(--purple2))}
+.player-name{margin-top:7px;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dice-row{display:flex;justify-content:center;gap:8px;margin-top:12px}.die{width:58px;height:58px;display:grid;place-items:center;border:1px solid var(--line2);border-radius:14px;background:#18142a;font-size:27px;font-weight:950}.vs{font-weight:950;color:var(--purple2)}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{padding:13px;border:1px solid var(--line);border-radius:13px;background:#0d0c16}.stat span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase}.stat strong{display:block;margin-top:6px;font-size:18px}
+.games{display:grid;gap:10px}.game{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:13px;border:1px solid var(--line);border-radius:13px;background:#0e0d18}.game-title{font-weight:900}.game-meta{margin-top:4px;color:var(--muted);font-size:12px}
+.inventory-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px}.item{position:relative;min-height:130px;padding:11px;border:1px solid var(--line);border-radius:14px;background:#100f1b;color:#fff;text-align:center}.item.selected{border-color:var(--purple2);background:rgba(139,92,246,.18)}.item-icon{height:58px;display:grid;place-items:center;font-size:38px}.item-name{font-size:11px;font-weight:900}.qty{position:absolute;right:7px;top:7px;padding:3px 6px;border-radius:999px;background:#05050599;font-size:10px}
+.gems{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;padding:16px;border:1px solid rgba(91,120,255,.35);border-radius:16px;background:radial-gradient(circle at 15% 20%,rgba(91,120,255,.18),transparent 34%),#101426;margin-bottom:16px}.gem-icon{width:62px;height:62px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(135deg,#243a8b,#4d66dc);font-size:34px}.gem-balance{font-size:19px;font-weight:950;margin:4px 0 8px}.gem-input-row{display:grid;grid-template-columns:minmax(0,220px) auto;gap:8px}
+.profile-hero{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}.profile-avatar{width:104px;height:104px;border-radius:23px;object-fit:cover;background:linear-gradient(135deg,var(--purple),var(--purple2))}.profile-name{margin:0;font-size:26px}.rank-badge{display:inline-block;margin-top:8px;padding:6px 10px;border:1px solid #fbbf2440;border-radius:999px;color:var(--yellow);background:#fbbf2412;font-size:11px;font-weight:900}.profile-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:18px}.progress{height:10px;background:#080710;border:1px solid var(--line);border-radius:999px;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--purple2));transition:width .3s}
+.login-box{width:min(620px,100%);margin:auto}.login-grid{display:grid;gap:12px}.challenge{padding:12px;border:1px solid var(--line);border-radius:13px;background:#0c0b14}.challenge-row{display:grid;grid-template-columns:1fr auto;gap:8px}.challenge-code{text-transform:uppercase;text-align:center;letter-spacing:4px;font-weight:950}.owner-box{padding:12px;border:1px solid #fbbf2440;border-radius:13px;background:#fbbf2408}
+.upgrader{display:grid;grid-template-columns:1fr 320px;gap:18px}.choice{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:11px;border:1px solid var(--line);border-radius:13px;background:#0d0c16;margin-bottom:9px}.wheel{width:275px;height:275px;position:relative;margin:auto;border-radius:50%;border:9px solid #15131f;background:conic-gradient(#2768ff 0 45%,#050505 45% 100%);box-shadow:0 25px 70px #0008}.needle{position:absolute;left:calc(50% - 2px);top:18px;width:4px;height:118px;transform-origin:50% 120px;background:#fff;border-radius:99px;transition:transform 3s cubic-bezier(.12,.72,.13,1)}.pointer{position:absolute;top:-25px;left:50%;transform:translateX(-50%);font-size:29px}.upgrade-result{text-align:center;font-weight:950;font-size:18px;min-height:28px;margin-top:14px}
+.chat-side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:18px;background:#08070f;border-left:1px solid var(--line)}.chat-list{flex:1;min-height:0;overflow:auto;margin:12px 0}.msg{padding:8px 0}.msg-user{padding:0;border:0;background:transparent;color:#bcb6ff;font-size:11px;font-weight:900}.msg-text{margin-top:3px;color:#ddd8ec;font-size:13px;word-break:break-word}.chat-compose{display:grid;grid-template-columns:1fr auto;gap:7px}
+.modal{position:fixed;inset:0;display:none;place-items:center;padding:18px;background:#000b;z-index:100}.modal.open{display:grid}.modal-card{width:min(680px,100%);max-height:88vh;overflow:auto;padding:18px;border:1px solid var(--line2);border-radius:18px;background:#100e1a}.modal-head{display:flex;justify-content:space-between;align-items:center}.close{width:38px;height:38px;border-radius:50%;background:transparent;color:#aaa;font-size:24px}.gift-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:8px}.gift{padding:11px;border:1px solid var(--line);border-radius:12px;background:#0c0b14;text-align:center}
+.toasts{position:fixed;right:14px;bottom:14px;display:grid;gap:8px;z-index:130}.toast{width:min(360px,calc(100vw - 28px));padding:12px;border:1px solid var(--line);border-radius:12px;background:#14111f;box-shadow:var(--shadow);font-size:12px}.toast.error{border-color:#fb718555}.toast.success{border-color:#34d39955}
+.mobile-nav{display:none}
+@media(max-width:1120px){.app{grid-template-columns:190px 1fr}.chat-side{display:none}.upgrader{grid-template-columns:1fr}}
+@media(max-width:760px){body{padding-bottom:74px}.app{display:block}.sidebar{display:none}main{padding:12px 12px 30px}.pill{display:none}.summary{grid-template-columns:1fr}.profile-hero{grid-template-columns:1fr;text-align:center}.profile-avatar{margin:auto}.profile-stats{grid-template-columns:repeat(2,1fr)}.gems{grid-template-columns:1fr}.gem-icon{margin:auto}.gem-input-row{grid-template-columns:1fr}.mobile-nav{position:fixed;display:grid;grid-template-columns:repeat(5,1fr);left:9px;right:9px;bottom:9px;padding:5px;border:1px solid var(--line);border-radius:16px;background:#0c0a13f2;backdrop-filter:blur(15px);z-index:60}.mobile-nav button{min-height:49px;border:0;border-radius:11px;background:transparent;color:var(--muted);font-size:19px}.mobile-nav button.active{background:#8b5cf62a;color:#fff}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand">NEON<span>DICE</span></div>
+  <nav class="nav">
+    <button type="button" data-route="dice" class="active">🎲 <span data-i18n="navDice">Dice</span></button>
+    <button type="button" data-route="inventory">🎒 <span data-i18n="navInventory">Inventar</span></button>
+    <button type="button" data-route="upgrader">⬆️ <span data-i18n="navUpgrader">Upgrader</span></button>
+    <button type="button" data-route="profile">👤 <span data-i18n="navProfile">Profil</span></button>
+    <div class="nav-title" data-i18n="community">Community</div>
+    <button type="button" data-route="chat">💬 <span data-i18n="navChat">Chat</span></button>
+    <button type="button" data-route="ranks">🏆 <span data-i18n="navRanks">Ränge</span></button>
+    <button type="button" id="langBtn">🌐 DE / EN</button>
+  </nav>
+</aside>
+
+<main>
+<div class="inner">
+<header class="top">
+  <div><h1 id="pageTitle">Dice</h1><div class="top-sub" id="pageSub">NeonDice</div></div>
+  <div class="top-actions">
+    <div class="pill" id="connectionPill"><span class="dot"></span><span id="connectionText">Supabase…</span></div>
+    <button class="profile-chip" type="button" id="profileChip"><img class="avatar" id="chipAvatar" alt=""><span id="chipName">Login</span></button>
+  </div>
+</header>
+
+<section class="panel active" id="page-dice">
+  <div class="card">
+    <h2 data-i18n="diceTitle">Two Dice Battle</h2>
+    <p data-i18n="diceSubtitle">Wähle deinen Einsatz. Würfel und Auszahlung werden serverseitig entschieden.</p>
+    <div class="dice-stage">
+      <div class="player">
+        <img id="p1Avatar" alt=""><div class="player-name" id="p1Name">Player 1</div>
+        <div class="dice-row"><div class="die" id="p1d1">?</div><div class="die" id="p1d2">?</div></div>
+      </div>
+      <div class="vs">VS</div>
+      <div class="player">
+        <img id="p2Avatar" alt=""><div class="player-name" id="p2Name">Wartet…</div>
+        <div class="dice-row"><div class="die" id="p2d1">?</div><div class="die" id="p2d2">?</div></div>
+      </div>
+    </div>
+    <div class="summary">
+      <div class="stat"><span data-i18n="selectedPets">Pets</span><strong id="selectedPets">0</strong></div>
+      <div class="stat"><span data-i18n="selectedGems">Gems</span><strong id="selectedGems">0</strong></div>
+      <div class="stat"><span data-i18n="petValue">Pet-Wert</span><strong id="selectedValue">0</strong></div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn primary" type="button" id="createGameBtn" data-i18n="createGame">Spiel erstellen</button>
+      <button class="btn secondary" type="button" id="chooseBetBtn">🎒 <span data-i18n="chooseBet">Einsatz auswählen</span></button>
+    </div>
+    <div class="small muted" id="diceStatus" style="margin-top:11px"></div>
+  </div>
+  <div class="card"><h2 data-i18n="openGames">Offene Spiele</h2><div class="games" id="gamesList"></div></div>
+</section>
+
+<section class="panel" id="page-inventory">
+  <div class="card">
+    <h2 data-i18n="inventoryTitle">Dein Inventar</h2>
+    <p data-i18n="inventorySubtitle">Huges werden mit 🐱 angezeigt. Gems sind eine eigene Währung.</p>
+    <div class="gems" style="margin-top:16px">
+      <div class="gem-icon">💎</div>
+      <div>
+        <div class="small muted" data-i18n="yourGems">Du hast</div>
+        <div class="gem-balance"><span id="gemBalance">0</span> Gems</div>
+        <label class="label" for="gemUse" data-i18n="gemUseLabel">Wie viele Gems möchtest du einsetzen?</label>
+        <div class="gem-input-row">
+          <input class="input" id="gemUse" type="number" min="0" step="1" value="0" inputmode="numeric">
+          <button class="btn secondary" type="button" id="maxGemsBtn">Max</button>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="justify-content:space-between;margin-bottom:12px">
+      <strong data-i18n="petsItems">Pets & Items</strong>
+      <div class="row">
+        <button class="btn secondary" type="button" id="selectAllBtn" data-i18n="selectAll">Alle auswählen</button>
+        <button class="btn secondary" type="button" id="clearBtn" data-i18n="clear">Löschen</button>
+      </div>
+    </div>
+    <div class="inventory-grid" id="inventoryGrid"></div>
+    <div class="row" style="margin-top:15px"><button class="btn primary" type="button" id="inventoryContinueBtn" data-i18n="continue">Weiter</button></div>
+  </div>
+</section>
+
+<section class="panel" id="page-upgrader">
+  <div class="card">
+    <h2>⬆️ Upgrader</h2><p data-i18n="upgraderSubtitle">Wähle dein Item und ein Ziel-Pet. Gewinnchance: 45 %.</p>
+    <div class="upgrader" style="margin-top:16px">
+      <div>
+        <strong data-i18n="yourItem">Dein Item</strong><div id="upgradeItems" style="margin-top:10px"></div>
+        <div class="divider"></div>
+        <label class="label" for="targetPet" data-i18n="targetPet">Ziel-Pet</label><select class="select" id="targetPet"><option value="">Lade…</option></select>
+      </div>
+      <div>
+        <div class="wheel"><div class="pointer">▼</div><div class="needle" id="needle"></div></div>
+        <div class="upgrade-result" id="upgradeResult">Bereit</div>
+        <button class="btn primary" style="width:100%;margin-top:12px" type="button" id="upgradeBtn" data-i18n="startUpgrade">Upgrade starten</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="page-profile">
+  <div class="card login-box" id="loginCard">
+    <h2 data-i18n="robloxLogin">Roblox Login</h2><p data-i18n="loginSubtitle">Roblox-Namen eingeben, Code erzeugen, in Bio kopieren und prüfen.</p>
+    <div class="login-grid" style="margin-top:15px">
+      <div><label class="label" for="robloxUser" data-i18n="robloxUsername">Roblox Benutzername</label><input class="input" id="robloxUser" autocomplete="username" autocapitalize="none" maxlength="20"></div>
+      <div class="owner-box hidden" id="ownerBox"><label class="label" for="ownerUid">Supabase Owner UID</label><input class="input" id="ownerUid" autocomplete="off"><div class="small muted" style="margin-top:6px">Nur für IchDerMeister0 erforderlich.</div></div>
+      <button class="btn primary" type="button" id="generateCodeBtn" data-i18n="generateCode">Code erzeugen</button>
+      <div class="challenge hidden" id="challengeBox">
+        <div class="small muted" data-i18n="yourCode">Dein Code</div>
+        <div class="challenge-row" style="margin-top:7px"><input class="input challenge-code" id="codeField" readonly><button class="btn secondary" type="button" id="copyBtn" data-i18n="copy">Kopieren</button></div>
+        <div class="small muted" style="margin-top:8px" data-i18n="bioInstruction">Code in die Roblox-Bio setzen und danach prüfen.</div>
+      </div>
+      <button class="btn secondary hidden" type="button" id="verifyBtn" data-i18n="verifyBio">Roblox Bio prüfen</button>
+      <div class="small" id="loginStatus"></div>
+    </div>
+  </div>
+
+  <div class="card hidden" id="profileCard">
+    <div class="profile-hero">
+      <img class="profile-avatar" id="profileAvatar" alt="">
+      <div><h2 class="profile-name" id="profileName">Roblox User</h2><div class="muted small" id="profileRobloxId">Roblox ID: –</div><div class="rank-badge" id="rankBadge">Rank 0</div></div>
+    </div>
+    <div class="profile-stats">
+      <div class="stat"><span data-i18n="gems">Gems</span><strong id="profileGems">0</strong></div>
+      <div class="stat"><span data-i18n="gamesPlayed">Spiele</span><strong id="profileGames">0</strong></div>
+      <div class="stat"><span data-i18n="winRate">Winrate</span><strong id="profileWinrate">0%</strong></div>
+      <div class="stat"><span data-i18n="wageredGems">Gems eingesetzt</span><strong id="profileWagered">0</strong></div>
+    </div>
+    <div class="divider"></div>
+    <div class="small muted"><span data-i18n="rankProgress">Rangfortschritt</span><span id="rankProgressText" style="float:right">0%</span></div>
+    <div class="progress"><div id="rankProgress"></div></div>
+    <div class="row" style="margin-top:16px"><button class="btn secondary" type="button" id="refreshProfileBtn" data-i18n="refresh">Aktualisieren</button><button class="btn danger-btn" type="button" id="logoutBtn" data-i18n="logout">Abmelden</button></div>
+  </div>
+</section>
+
+<section class="panel" id="page-chat">
+  <div class="card" style="min-height:60vh;display:flex;flex-direction:column">
+    <h2>💬 Global Chat</h2><div class="chat-list" id="mobileMessages"></div>
+    <div class="chat-compose"><input class="input" id="mobileChatInput" maxlength="300" placeholder="Nachricht…"><button class="btn primary" type="button" id="mobileSendBtn">➤</button></div>
+  </div>
+</section>
+
+<section class="panel" id="page-ranks">
+  <div class="card"><h2 data-i18n="ranksTitle">Ränge</h2><p data-i18n="ranksSubtitle">Ränge basieren auf insgesamt eingesetzten Gems.</p>
+    <div class="profile-stats"><div class="stat"><span>Rank 1</span><strong>1M</strong></div><div class="stat"><span>Rank 2</span><strong>10M</strong></div><div class="stat"><span>Rank 3</span><strong>100M</strong></div><div class="stat"><span>Rank 4</span><strong>1B</strong></div></div>
+  </div>
+</section>
+</div>
+</main>
+
+<aside class="chat-side"><strong>💬 Global Chat</strong><div class="chat-list" id="desktopMessages"></div><div class="chat-compose"><input class="input" id="desktopChatInput" maxlength="300" placeholder="Nachricht…"><button class="btn primary" type="button" id="desktopSendBtn">➤</button></div></aside>
+</div>
+
+<nav class="mobile-nav"><button type="button" data-mobile-route="dice" class="active">🎲</button><button type="button" data-mobile-route="inventory">🎒</button><button type="button" data-mobile-route="upgrader">⬆️</button><button type="button" data-mobile-route="chat">💬</button><button type="button" data-mobile-route="profile">👤</button></nav>
+
+<div class="modal" id="userModal"><div class="modal-card"><div class="modal-head"><div><h2 id="modalName" style="margin:0">User</h2><div class="small muted" id="modalMeta"></div></div><button class="close" type="button" id="closeModalBtn">×</button></div><div class="divider"></div><div id="modalStats"></div><div class="divider"></div><strong data-i18n="giftItem">Item verschenken</strong><div class="gift-grid" id="giftGrid" style="margin-top:10px"></div></div></div>
+<div class="toasts" id="toasts"></div>
+<script>
+"use strict";
+
+/* ============================================================================
+   NeonDice configuration
+   ============================================================================ */
+const CONFIG = Object.freeze({
+  URL:"https://dtafhtluycvvisuehphd.supabase.co",
+  KEY:"sb_publishable_l2SONE96HDFKPj9Dd02RgA_e7LIB_j0",
+  OWNER_NAME:"IchDerMeister0",
+  LOCAL:"neondice_verified_session_v2",
+  LANG:"neondice_lang",
+  RANKS:[0,1000000,10000000,100000000,1000000000],
+  EDGE_GENERATE:["verify-roblox-bio","roblox-code-v2","roblox-code"],
+  EDGE_VERIFY:["verify-roblox-bio","roblox-login-v2","roblox-login"],
+  RPC_CREATE:["neondice_create_match","create_dice_game","create_match"],
+  RPC_JOIN:["neondice_join_match","join_dice_game","join_match"],
+  RPC_FINISH:["neondice_finish_match","finish_dice_game","settle_match"],
+  RPC_UPGRADE:["play_upgrade","neondice_play_upgrade","upgrade_item"],
+  RPC_GIFT:["gift_inventory_item","neondice_gift_item","gift_item"],
+  RPC_CHAT:["send_chat_message","neondice_send_chat"],
+  GAMES:["games","dice_games_v2"],
+  CHAT:["public_chat_messages","messages","chat_messages"],
+  TARGETS:["pet_catalog","pets","upgrade_targets"]
+});
+
+const state={
+  lang:localStorage.getItem(CONFIG.LANG)||"de",route:"dice",session:readLocal(),
+  profile:null,inventory:[],selected:new Set(),gems:0,upgradeItem:null,
+  games:[],messages:[],gamesTable:null,chatTable:null,targetTable:null,
+  challenge:{id:null,code:null,username:null,expires:null},
+  busy:{code:false,verify:false,create:false,join:false,upgrade:false,gift:false,chat:false}
+};
+
+const I18N={
+de:{navDice:"Dice",navInventory:"Inventar",navUpgrader:"Upgrader",navProfile:"Profil",community:"Community",navChat:"Chat",navRanks:"Ränge",diceTitle:"Two Dice Battle",diceSubtitle:"Wähle deinen Einsatz. Würfel und Auszahlung werden serverseitig entschieden.",selectedPets:"Ausgewählte Pets",selectedGems:"Ausgewählte Gems",petValue:"Pet-Wert",createGame:"Spiel erstellen",chooseBet:"Einsatz auswählen",openGames:"Offene Spiele",inventoryTitle:"Dein Inventar",inventorySubtitle:"Huges werden mit 🐱 angezeigt. Gems sind eine eigene Währung.",yourGems:"Du hast",gemUseLabel:"Wie viele Gems möchtest du einsetzen?",petsItems:"Pets & Items",selectAll:"Alle auswählen",clear:"Auswahl löschen",continue:"Weiter",upgraderSubtitle:"Wähle dein Item und ein Ziel-Pet. Gewinnchance: 45 %.",yourItem:"Dein Item",targetPet:"Ziel-Pet",startUpgrade:"Upgrade starten",robloxLogin:"Roblox Login",loginSubtitle:"Roblox-Namen eingeben, Code erzeugen, in Bio kopieren und prüfen.",robloxUsername:"Roblox Benutzername",generateCode:"Code erzeugen",yourCode:"Dein Code",copy:"Kopieren",bioInstruction:"Code in die Roblox-Bio setzen und danach prüfen.",verifyBio:"Roblox Bio prüfen",gems:"Gems",gamesPlayed:"Spiele",winRate:"Winrate",wageredGems:"Gems eingesetzt",rankProgress:"Rangfortschritt",refresh:"Aktualisieren",logout:"Abmelden",ranksTitle:"Ränge",ranksSubtitle:"Ränge basieren auf insgesamt eingesetzten Gems.",giftItem:"Item verschenken"},
+en:{navDice:"Dice",navInventory:"Inventory",navUpgrader:"Upgrader",navProfile:"Profile",community:"Community",navChat:"Chat",navRanks:"Ranks",diceTitle:"Two Dice Battle",diceSubtitle:"Choose your stake. Dice and payout are decided server-side.",selectedPets:"Selected pets",selectedGems:"Selected Gems",petValue:"Pet value",createGame:"Create game",chooseBet:"Choose bet",openGames:"Open games",inventoryTitle:"Your inventory",inventorySubtitle:"Huge pets use 🐱. Gems are a separate currency.",yourGems:"You have",gemUseLabel:"How many Gems do you want to use?",petsItems:"Pets & Items",selectAll:"Select all",clear:"Clear selection",continue:"Continue",upgraderSubtitle:"Choose your item and a target pet. Win chance: 45%.",yourItem:"Your item",targetPet:"Target pet",startUpgrade:"Start upgrade",robloxLogin:"Roblox Login",loginSubtitle:"Enter Roblox name, generate code, copy it to bio and verify.",robloxUsername:"Roblox username",generateCode:"Generate code",yourCode:"Your code",copy:"Copy",bioInstruction:"Put the code in your Roblox bio and verify.",verifyBio:"Verify Roblox bio",gems:"Gems",gamesPlayed:"Games",winRate:"Win rate",wageredGems:"Wagered Gems",rankProgress:"Rank progress",refresh:"Refresh",logout:"Logout",ranksTitle:"Ranks",ranksSubtitle:"Ranks are based on total wagered Gems.",giftItem:"Gift item"}
+};
+
+function $(id){return document.getElementById(id)}
+function safe(v,f=""){const s=String(v??"").trim();return s||f}
+function num(v,f=0){const n=Number(v);return Number.isFinite(n)?Math.floor(n):f}
+function clamp(v,a,b){return Math.min(b,Math.max(a,v))}
+function fmt(v){return new Intl.NumberFormat(state.lang==="de"?"de-DE":"en-US").format(num(v))}
+function compact(v){return new Intl.NumberFormat(state.lang==="de"?"de-DE":"en-US",{notation:"compact",maximumFractionDigits:1}).format(Number(v)||0)}
+function isUUID(v){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(v||""))}
+function ownerName(v){return safe(v).toLowerCase()===CONFIG.OWNER_NAME.toLowerCase()}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+function readLocal(){try{return JSON.parse(localStorage.getItem(CONFIG.LOCAL)||"null")}catch(_){return null}}
+function saveLocal(v){state.session=v;localStorage.setItem(CONFIG.LOCAL,JSON.stringify(v))}
+function authToken(){return state.session?.access_token||CONFIG.KEY}
+function headers(extra={}){return Object.assign({"apikey":CONFIG.KEY,"Authorization":"Bearer "+authToken(),"Content-Type":"application/json"},extra)}
+function userId(){return state.session?.supabase_user_id||state.profile?.id||state.profile?.user_id||null}
+function username(){return state.profile?.roblox_username||state.profile?.username||state.session?.roblox_username||"Player"}
+function gems(){return num(state.profile?.gems??state.profile?.game_points??state.profile?.points??0)}
+function wagered(){return num(state.profile?.wagered_gems??state.profile?.played_points??state.profile?.total_wagered??0)}
+function played(){return num(state.profile?.games_played??state.profile?.matches_played??0)}
+function won(){return num(state.profile?.games_won??state.profile?.matches_won??0)}
+function winrate(){if(state.profile?.win_rate!=null)return Number(state.profile.win_rate)||0;return played()?won()/played()*100:0}
+function avatar(){return state.profile?.roblox_avatar_url||state.profile?.avatar_url||state.profile?.profile_image_url||""}
+
+function toast(text,type="info"){const e=document.createElement("div");e.className="toast "+type;e.textContent=text;$("toasts").appendChild(e);setTimeout(()=>e.remove(),3400)}
+function setConnection(ok,text){$("connectionPill").className="pill "+(ok===true?"ok":ok===false?"err":"");$("connectionText").textContent=text}
+
+async function request(url,opts={}){
+  const res=await fetch(url,Object.assign({},opts,{headers:headers(opts.headers||{})}));
+  const txt=await res.text();let data={};
+  try{data=txt?JSON.parse(txt):{}}catch(_){data={message:txt}}
+  if(!res.ok){const err=new Error(data.message||data.error||data.error_description||("HTTP "+res.status));err.status=res.status;err.code=data.code;throw err}
+  return data
+}
+function q(table,query=""){return CONFIG.URL+"/rest/v1/"+table+(query?("?"+query):"")}
+async function rest(table,query=""){return request(q(table,query),{method:"GET",headers:{"Accept":"application/json"}})}
+async function insert(table,payload){return request(q(table),{method:"POST",headers:{"Prefer":"return=representation"},body:JSON.stringify(payload)})}
+async function rpc(name,args){return request(CONFIG.URL+"/rest/v1/rpc/"+name,{method:"POST",body:JSON.stringify(args)})}
+async function edge(name,payload){return request(CONFIG.URL+"/functions/v1/"+name,{method:"POST",body:JSON.stringify(payload)})}
+
+function missing(e){const s=String(e?.message||"").toLowerCase();return e?.status===404||s.includes("not found")||s.includes("could not find")||s.includes("does not exist")||s.includes("schema cache")}
+async function edgeAny(names,payload){let last;for(const n of names){try{return {name:n,data:await edge(n,payload)}}catch(e){last=e;if(!missing(e)&&e.status!==405)throw e}}throw last||new Error("Keine passende Edge Function gefunden")}
+async function rpcAny(names,variants){let last;for(const args of variants){for(const n of names){try{return {name:n,data:await rpc(n,args)}}catch(e){last=e;if(!missing(e)&&!String(e.message).toLowerCase().includes("parameter"))break}}}throw last||new Error("Keine passende RPC gefunden")}
+async function tableAny(names){for(const n of names){try{await rest(n,"select=*&limit=1");return n}catch(e){if(!missing(e))return n}}return null}
+
+function route(name){
+  state.route=name;document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));$("page-"+name)?.classList.add("active");
+  document.querySelectorAll("[data-route]").forEach(b=>b.classList.toggle("active",b.dataset.route===name));
+  document.querySelectorAll("[data-mobile-route]").forEach(b=>b.classList.toggle("active",b.dataset.mobileRoute===name));
+  $("pageTitle").textContent=name[0].toUpperCase()+name.slice(1);
+  if(name==="inventory")loadInventory();if(name==="profile")loadProfile();if(name==="chat")loadChat();if(name==="upgrader")loadTargets()
+}
+function applyLang(){document.documentElement.lang=state.lang;document.querySelectorAll("[data-i18n]").forEach(e=>{const k=e.dataset.i18n;if(I18N[state.lang][k])e.textContent=I18N[state.lang][k]});localStorage.setItem(CONFIG.LANG,state.lang);renderInventory();renderProfile();renderGames();renderChat();summary()}
+function toggleLang(){state.lang=state.lang==="de"?"en":"de";applyLang()}
+
+async function ping(){setConnection(null,"Supabase…");try{const r=await fetch(CONFIG.URL+"/auth/v1/settings",{headers:{apikey:CONFIG.KEY}});if(!r.ok)throw new Error("HTTP "+r.status);setConnection(true,"Online")}catch(e){setConnection(false,"Fehler");toast("Supabase: "+e.message,"error")}}
+
+async function profileBy(col,val){const rows=await rest("profiles","select=*&"+encodeURIComponent(col)+"=eq."+encodeURIComponent(val)+"&limit=1");return Array.isArray(rows)?(rows[0]||null):null}
+async function loadProfile(){
+  if(!state.session){state.profile=null;renderProfile();return}
+  let p=null,last=null;
+  for(const [c,v] of [["id",userId()],["user_id",userId()],["roblox_username",state.session.roblox_username],["username",state.session.roblox_username]]){
+    if(!v)continue;try{p=await profileBy(c,v);if(p)break}catch(e){last=e}
+  }
+  state.profile=p;renderProfile();renderChip();renderDicePlayer();if(last&&!p)console.warn("profile fallback:",last)
+}
+function rank(v){v=Number(v)||0;if(v>=CONFIG.RANKS[4])return 4;if(v>=CONFIG.RANKS[3])return 3;if(v>=CONFIG.RANKS[2])return 2;if(v>=CONFIG.RANKS[1])return 1;return 0}
+function rankProgress(v){v=Math.max(0,Number(v)||0);const r=rank(v);if(r===4)return {rank:4,pct:100,next:null};const a=CONFIG.RANKS[r],b=CONFIG.RANKS[r+1];return {rank:r,pct:clamp((v-a)/(b-a)*100,0,100),next:b}}
+function renderProfile(){
+  const on=!!state.session;$("loginCard").classList.toggle("hidden",on);$("profileCard").classList.toggle("hidden",!on);if(!on)return;
+  const rp=rankProgress(wagered());$("profileName").textContent=username();$("profileRobloxId").textContent="Roblox ID: "+(state.profile?.roblox_user_id||state.profile?.roblox_id||state.session.roblox_user_id||"–");
+  $("rankBadge").textContent="Rank "+rp.rank;$("profileGems").textContent=fmt(gems());$("profileGames").textContent=fmt(played());$("profileWinrate").textContent=winrate().toFixed(2)+"%";$("profileWagered").textContent=compact(wagered());$("rankProgress").style.width=rp.pct.toFixed(2)+"%";$("rankProgressText").textContent=rp.next?(rp.pct.toFixed(1)+"% · "+compact(rp.next)):"MAX";
+  if(avatar())$("profileAvatar").src=avatar();else $("profileAvatar").removeAttribute("src")
+}
+function renderChip(){$("chipName").textContent=state.session?username():"Login";if(avatar())$("chipAvatar").src=avatar();else $("chipAvatar").removeAttribute("src")}
+function renderDicePlayer(){$("p1Name").textContent=username();if(avatar())$("p1Avatar").src=avatar();else $("p1Avatar").removeAttribute("src")}
+
+function resetChallenge(){state.challenge={id:null,code:null,username:null,expires:null};$("challengeBox").classList.add("hidden");$("verifyBtn").classList.add("hidden");$("codeField").value="";$("loginStatus").textContent=""}
+function ownerField(){$("ownerBox").classList.toggle("hidden",!ownerName($("robloxUser").value));if(!ownerName($("robloxUser").value))$("ownerUid").value=""}
+
+async function generateCode(){
+  if(state.busy.code)return;const u=safe($("robloxUser").value),uid=safe($("ownerUid").value);if(!u){$("loginStatus").textContent="Bitte Roblox Benutzername eingeben.";return}
+  if(ownerName(u)&&!isUUID(uid)){$("loginStatus").textContent="Für IchDerMeister0 ist eine gültige Supabase UID erforderlich.";return}
+  state.busy.code=true;$("generateCodeBtn").disabled=true;$("loginStatus").textContent="Code wird serverseitig erzeugt…";
+  try{
+    const {data}=await edgeAny(CONFIG.EDGE_GENERATE,[{action:"generate",roblox_username:u,username:u,owner_uid:ownerName(u)?uid:null}].flat()[0]);
+    const code=safe(data.code||data.verification_code||data.challenge_code).toUpperCase();if(!/^[A-Z]{10}$/.test(code))throw new Error("Server hat keinen gültigen 10-Buchstaben-Code geliefert");
+    state.challenge={id:data.challenge_id||data.id||null,code,username:u,expires:data.expires_at||null};$("codeField").value=code;$("challengeBox").classList.remove("hidden");$("verifyBtn").classList.remove("hidden");$("loginStatus").textContent="Code erzeugt. In Roblox-Bio kopieren."
+  }catch(e){$("loginStatus").textContent="Code-Fehler: "+e.message}finally{state.busy.code=false;$("generateCodeBtn").disabled=false}
+}
+async function copyCode(){if(!state.challenge.code)return;try{await navigator.clipboard.writeText(state.challenge.code)}catch(_){$("codeField").select();document.execCommand("copy")}toast("Code kopiert.","success")}
+
+async function establish(data){
+  let access=data?.session?.access_token||data?.access_token||null,refresh=data?.session?.refresh_token||data?.refresh_token||null;
+  if(!access&&data?.email&&data?.password){
+    const auth=await request(CONFIG.URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:{apikey:CONFIG.KEY,Authorization:"Bearer "+CONFIG.KEY},body:JSON.stringify({email:data.email,password:data.password})});
+    access=auth.access_token;refresh=auth.refresh_token
+  }
+  return {access_token:access,refresh_token:refresh}
+}
+async function verifyBio(){
+  if(state.busy.verify)return;const u=safe($("robloxUser").value),uid=safe($("ownerUid").value);if(!state.challenge.code){$("loginStatus").textContent="Bitte zuerst Code erzeugen.";return}
+  if(u.toLowerCase()!==state.challenge.username.toLowerCase()){resetChallenge();$("loginStatus").textContent="Benutzername geändert. Neuen Code erzeugen.";return}
+  if(ownerName(u)&&!isUUID(uid)){$("loginStatus").textContent="Owner UID fehlt oder ist ungültig.";return}
+  state.busy.verify=true;$("verifyBtn").disabled=true;$("loginStatus").textContent="Roblox Bio wird geprüft…";
+  try{
+    const {data}=await edgeAny(CONFIG.EDGE_VERIFY,{action:"verify",roblox_username:u,username:u,code:state.challenge.code,challenge_id:state.challenge.id,owner_uid:ownerName(u)?uid:null});
+    if(data.success===false||data.verified===false)throw new Error(data.error||data.message||"Verifizierung fehlgeschlagen");
+    const tokens=await establish(data);saveLocal({roblox_username:u,roblox_user_id:data.roblox_user_id||data.roblox_id||data.profile?.roblox_user_id||null,supabase_user_id:data.supabase_user_id||data.user_id||data.profile?.id||null,access_token:tokens.access_token,refresh_token:tokens.refresh_token,owner:ownerName(u),verified_at:new Date().toISOString()});
+    resetChallenge();await loadProfile();await loadInventory();await loadGames();await loadChat();renderProfile();renderChip();toast("Roblox Login erfolgreich.","success")
+  }catch(e){$("loginStatus").textContent=e.message}finally{state.busy.verify=false;$("verifyBtn").disabled=false}
+}
+async function logout(){localStorage.removeItem(CONFIG.LOCAL);state.session=null;state.profile=null;state.inventory=[];state.selected.clear();state.gems=0;renderProfile();renderInventory();renderChip();route("profile")}
+
+function normalizeItem(r){return {id:r.id??r.inventory_id??r.item_id,itemId:r.item_id??r.catalog_item_id??r.id,name:safe(r.item_name??r.name??r.pet_name,"Item"),quantity:Math.max(0,num(r.quantity??r.count??1,1)),value:Math.max(0,Number(r.gem_value??r.value??r.item_value??0)||0),raw:r}}
+function currencyItem(i){return ["spielpunkte","game points","gems"].includes(i.name.toLowerCase().trim())}
+async function loadInventory(){
+  if(!userId()){state.inventory=[];renderInventory();return}
+  let rows=null,last=null;for(const c of ["user_id","owner_id","profile_id"]){try{rows=await rest("inventory","select=*&"+c+"=eq."+encodeURIComponent(userId())+"&limit=500");break}catch(e){last=e}}
+  if(!rows){state.inventory=[];renderInventory();if(last)toast("Inventar: "+last.message,"error");return}
+  state.inventory=rows.map(normalizeItem).filter(i=>i.quantity>0&&!currencyItem(i));renderInventory()
+}
+function renderInventory(){
+  const g=$("inventoryGrid");if(!g)return;g.innerHTML="";$("gemBalance").textContent=fmt(gems());$("gemUse").max=String(gems());
+  if(!state.inventory.length){const e=document.createElement("div");e.className="muted small";e.textContent=state.session?"Keine Items im Inventar.":"Bitte zuerst einloggen.";g.appendChild(e);summary();renderUpgradeItems();return}
+  for(const i of state.inventory){const b=document.createElement("button");b.type="button";b.className="item"+(state.selected.has(String(i.id))?" selected":"");const ic=document.createElement("div");ic.className="item-icon";ic.textContent="🐱";const n=document.createElement("div");n.className="item-name";n.textContent=i.name;const q=document.createElement("div");q.className="qty";q.textContent="×"+i.quantity;b.append(ic,n,q);b.onclick=()=>{const k=String(i.id);state.selected.has(k)?state.selected.delete(k):state.selected.add(k);renderInventory()};g.appendChild(b)}
+  summary();renderUpgradeItems()
+}
+function selectedItems(){return state.inventory.filter(i=>state.selected.has(String(i.id)))}
+function summary(){const items=selectedItems();$("selectedPets").textContent=items.length;$("selectedGems").textContent=fmt(state.gems);$("selectedValue").textContent=fmt(items.reduce((s,i)=>s+i.value,0))}
+function setGems(v){state.gems=clamp(num(v),0,gems());$("gemUse").value=String(state.gems);summary()}
+
+async function loadGames(){
+  if(!state.gamesTable)state.gamesTable=await tableAny(CONFIG.GAMES);if(!state.gamesTable){state.games=[];renderGames();return}
+  try{const rows=await rest(state.gamesTable,"select=*&order=created_at.desc&limit=50");state.games=(Array.isArray(rows)?rows:[]).filter(g=>String(g.status||"open").toLowerCase()!=="finished");renderGames()}catch(e){state.games=[];renderGames();console.warn(e)}
+}
+function stake(g){return num(g.creator_gems??g.gems??g.stake??g.creator_stake??0)}
+function renderGames(){const box=$("gamesList");if(!box)return;box.innerHTML="";if(!state.games.length){box.innerHTML='<div class="small muted">Keine offenen Spiele.</div>';return}for(const g of state.games){const r=document.createElement("div");r.className="game";const a=document.createElement("div");const t=document.createElement("div");t.className="game-title";t.textContent="🎲 "+safe(g.player1_name??g.creator_name??g.creator_username,"Player");const m=document.createElement("div");m.className="game-meta";m.textContent="💎 "+fmt(stake(g))+" Gems";a.append(t,m);const b=document.createElement("button");b.className="btn primary";b.type="button";b.textContent="Join";b.onclick=()=>joinGame(g);r.append(a,b);box.appendChild(r)}}
+
+async function createGame(){
+  if(state.busy.create)return;if(!userId()){toast("Bitte zuerst einloggen.","error");route("profile");return}const items=selectedItems();if(!items.length&&state.gems<=0){route("inventory");toast("Bitte Einsatz auswählen.","error");return}if(state.gems>gems()){toast("Nicht genügend Gems.","error");return}
+  state.busy.create=true;$("createGameBtn").disabled=true;try{await rpcAny(CONFIG.RPC_CREATE,[{p_gems:state.gems,p_inventory_ids:items.map(i=>i.id)},{p_stake:state.gems,p_inventory_ids:items.map(i=>i.id)},{p_items:items.map(i=>i.id),p_points:state.gems}]);state.selected.clear();setGems(0);await loadProfile();await loadInventory();await loadGames();toast("Spiel erstellt.","success");route("dice")}catch(e){toast("Create: "+e.message,"error")}finally{state.busy.create=false;$("createGameBtn").disabled=false}
+}
+async function joinGame(g){
+  if(state.busy.join)return;if(!userId()){route("profile");return}const req=stake(g),have=gems();if(req>have){toast("Du brauchst "+fmt(req)+" Gems, hast aber "+fmt(have)+".","error");return}
+  state.busy.join=true;try{await rpcAny(CONFIG.RPC_JOIN,[{p_game_id:g.id,p_gems:req},{p_game_id:g.id,p_stake:req},{p_game_id:g.id}]);toast("Spiel beigetreten.","success");await loadProfile();await loadGames();finishGame(g.id)}catch(e){toast("Join: "+e.message,"error")}finally{state.busy.join=false}
+}
+async function finishGame(id){try{const {data}=await rpcAny(CONFIG.RPC_FINISH,[{p_game_id:id}]);const g=Array.isArray(data)?data[0]:data;if(g)showFinished(g);await loadProfile();await loadGames()}catch(e){console.warn("finish:",e)}}
+function showFinished(g){$("p1Name").textContent=safe(g.player1_name??g.creator_name,"Player 1");$("p2Name").textContent=safe(g.player2_name??g.joiner_name,"Player 2");$("p1d1").textContent=g.player1_die1??g.creator_die1??"?";$("p1d2").textContent=g.player1_die2??g.creator_die2??"?";$("p2d1").textContent=g.player2_die1??"?";$("p2d2").textContent=g.player2_die2??"?";$("diceStatus").textContent=safe(g.winner_name??g.winner,"Finished")}
+
+function renderUpgradeItems(){const box=$("upgradeItems");if(!box)return;box.innerHTML="";for(const i of state.inventory){const r=document.createElement("div");r.className="choice";const ic=document.createElement("div");ic.textContent="🐱";ic.style.fontSize="28px";const info=document.createElement("div");info.innerHTML="";const n=document.createElement("strong");n.textContent=i.name;const v=document.createElement("div");v.className="small muted";v.textContent=i.value?("💎 "+fmt(i.value)):("×"+i.quantity);info.append(n,v);const b=document.createElement("button");b.className="btn "+(String(state.upgradeItem)===String(i.id)?"primary":"secondary");b.type="button";b.textContent=String(state.upgradeItem)===String(i.id)?"✓":"Wählen";b.onclick=()=>{state.upgradeItem=i.id;renderUpgradeItems()};r.append(ic,info,b);box.appendChild(r)}}
+async function loadTargets(){if(!state.targetTable)state.targetTable=await tableAny(CONFIG.TARGETS);const s=$("targetPet");s.innerHTML="";let rows=[];if(state.targetTable){try{rows=await rest(state.targetTable,"select=*&limit=300")}catch(_){}}if(!rows.length)rows=[{id:"Huge Cosmic Cat",name:"Huge Cosmic Cat"},{id:"Huge Festive Seal",name:"Huge Festive Seal"},{id:"Huge Rainbow Cat",name:"Huge Rainbow Cat"}];for(const r of rows){const o=document.createElement("option");o.value=String(r.id??r.pet_id??r.name);o.textContent=safe(r.name??r.pet_name??r.item_name,"Pet");s.appendChild(o)}}
+async function upgrade(){
+  if(state.busy.upgrade)return;if(!userId()){route("profile");return}if(!state.upgradeItem){toast("Bitte Item auswählen.","error");return}const target=$("targetPet").value;if(!target)return;
+  state.busy.upgrade=true;$("upgradeBtn").disabled=true;$("upgradeResult").textContent="Auslosung läuft…";try{const {data}=await rpcAny(CONFIG.RPC_UPGRADE,[{p_inventory_id:state.upgradeItem,p_target_pet_id:target},{p_item_id:state.upgradeItem,p_target_pet:target}]);const x=Array.isArray(data)?data[0]:data;const win=!!(x?.won??x?.is_win??x?.success);const a=Number.isFinite(Number(x?.angle))?1080+Number(x.angle):1080+(win?80:250);$("needle").style.transform="rotate("+a+"deg)";await sleep(3050);$("upgradeResult").textContent=win?"GEWONNEN · 45 %":"VERLOREN · 55 %";$("upgradeResult").style.color=win?"var(--green)":"var(--red)";state.upgradeItem=null;await loadInventory();await loadProfile()}catch(e){$("upgradeResult").textContent=e.message;$("upgradeResult").style.color="var(--red)"}finally{state.busy.upgrade=false;$("upgradeBtn").disabled=false}
+}
+
+function normMsg(r){return {id:r.id,userId:r.user_id??r.profile_id??r.sender_id,username:safe(r.roblox_username??r.username??r.user_name??r.sender_name,"Player"),text:safe(r.message??r.content??r.text),raw:r}}
+async function loadChat(){if(!state.chatTable)state.chatTable=await tableAny(CONFIG.CHAT);if(!state.chatTable){state.messages=[];renderChat();return}try{const rows=await rest(state.chatTable,"select=*&order=created_at.asc&limit=150");state.messages=(Array.isArray(rows)?rows:[]).map(normMsg).filter(m=>m.text);renderChat()}catch(e){state.messages=[];renderChat();console.warn(e)}}
+function drawChat(id){const box=$(id);if(!box)return;box.innerHTML="";if(!state.messages.length){box.innerHTML='<div class="small muted">Noch keine Nachrichten.</div>';return}for(const m of state.messages){const d=document.createElement("div");d.className="msg";const u=document.createElement("button");u.type="button";u.className="msg-user";u.textContent=m.username;u.onclick=()=>openUser(m);const tx=document.createElement("div");tx.className="msg-text";tx.textContent=m.text;d.append(u,tx);box.appendChild(d)}box.scrollTop=box.scrollHeight}
+function renderChat(){drawChat("desktopMessages");drawChat("mobileMessages")}
+async function sendChat(text){
+  if(state.busy.chat)return;text=safe(text);if(!text)return;if(text.length>300){toast("Nachricht zu lang.","error");return}if(!userId()){route("profile");return}state.busy.chat=true;
+  try{let sent=false;try{await rpcAny(CONFIG.RPC_CHAT,[{p_message:text}]);sent=true}catch(e){if(!missing(e))throw e}if(!sent){if(!state.chatTable)state.chatTable=await tableAny(CONFIG.CHAT);if(!state.chatTable)throw new Error("Chat Tabelle fehlt");let last;for(const p of [{user_id:userId(),username:username(),message:text},{user_id:userId(),username:username(),content:text}]){try{await insert(state.chatTable,p);sent=true;break}catch(e){last=e}}if(!sent)throw last} $("desktopChatInput").value="";$("mobileChatInput").value="";await loadChat()}catch(e){toast("Chat: "+e.message,"error")}finally{state.busy.chat=false}
+}
+
+async function modalProfile(m){for(const [c,v] of [["id",m.userId],["user_id",m.userId],["roblox_username",m.username],["username",m.username]]){if(!v)continue;try{const p=await profileBy(c,v);if(p)return p}catch(_){}}return null}
+async function openUser(m){$("userModal").classList.add("open");$("modalName").textContent=m.username;$("modalMeta").textContent="Lade Profil…";$("modalStats").innerHTML="";try{const p=await modalProfile(m);const gp=num(p?.games_played??p?.matches_played),gw=num(p?.games_won??p?.matches_won),wr=gp?gw/gp*100:0,wg=num(p?.wagered_gems??p?.played_points);$("modalMeta").textContent="Rank "+rank(wg)+" · "+wr.toFixed(2)+"%";$("modalStats").textContent="Games: "+fmt(gp)+" · Wins: "+fmt(gw)+" · Wagered: "+compact(wg)}catch(e){$("modalMeta").textContent=e.message}renderGift(m)}
+function renderGift(m){const g=$("giftGrid");g.innerHTML="";if(!state.inventory.length){g.innerHTML='<div class="small muted">Keine Items.</div>';return}for(const i of state.inventory){const d=document.createElement("div");d.className="gift";const ic=document.createElement("div");ic.textContent="🐱";ic.style.fontSize="30px";const n=document.createElement("div");n.className="small";n.textContent=i.name;const b=document.createElement("button");b.className="btn primary";b.type="button";b.style.marginTop="7px";b.textContent="Schenken";b.onclick=()=>gift(m,i);d.append(ic,n,b);g.appendChild(d)}}
+async function gift(m,i){if(state.busy.gift)return;state.busy.gift=true;try{await rpcAny(CONFIG.RPC_GIFT,[{p_receiver_user_id:m.userId,p_receiver_username:m.username,p_inventory_id:i.id},{p_receiver_username:m.username,p_item_id:i.id},{p_recipient:m.username,p_inventory_id:i.id}]);$("userModal").classList.remove("open");toast("Item verschenkt.","success");await loadInventory()}catch(e){toast("Gift: "+e.message,"error")}finally{state.busy.gift=false}}
+
+function bind(){
+  document.querySelectorAll("[data-route]").forEach(b=>b.onclick=()=>route(b.dataset.route));document.querySelectorAll("[data-mobile-route]").forEach(b=>b.onclick=()=>route(b.dataset.mobileRoute));
+  $("profileChip").onclick=()=>route("profile");$("langBtn").onclick=toggleLang;$("chooseBetBtn").onclick=()=>route("inventory");$("inventoryContinueBtn").onclick=()=>route("dice");
+  $("robloxUser").oninput=()=>{ownerField();resetChallenge()};$("ownerUid").oninput=resetChallenge;$("generateCodeBtn").onclick=generateCode;$("copyBtn").onclick=copyCode;$("verifyBtn").onclick=verifyBio;$("refreshProfileBtn").onclick=loadProfile;$("logoutBtn").onclick=logout;
+  $("gemUse").oninput=e=>setGems(e.target.value);$("maxGemsBtn").onclick=()=>setGems(gems());$("selectAllBtn").onclick=()=>{state.selected=new Set(state.inventory.map(i=>String(i.id)));renderInventory()};$("clearBtn").onclick=()=>{state.selected.clear();renderInventory()};$("createGameBtn").onclick=createGame;
+  $("upgradeBtn").onclick=upgrade;$("desktopSendBtn").onclick=()=>sendChat($("desktopChatInput").value);$("mobileSendBtn").onclick=()=>sendChat($("mobileChatInput").value);
+  $("desktopChatInput").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();sendChat(e.target.value)}};$("mobileChatInput").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();sendChat(e.target.value)}};
+  $("closeModalBtn").onclick=()=>$("userModal").classList.remove("open");$("userModal").onclick=e=>{if(e.target===$("userModal"))$("userModal").classList.remove("open")}
+}
+async function init(){bind();ownerField();applyLang();await ping();await loadProfile();await Promise.allSettled([loadInventory(),loadGames(),loadChat(),loadTargets()]);renderChip();renderDicePlayer();route("dice");setInterval(()=>loadChat(),5000);setInterval(()=>loadGames(),7000)}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>init(),{once:true});else init();
+
+/* Build metadata: not a security mechanism. */
+const NEONDICE_BUILD=Object.freeze({version:"2026.08.20-extreme",currency:"gems",rankSource:"wagered_gems",roblox:"server-challenge",upgrader:"server-45-percent",dice:"server-rpc"});
+void NEONDICE_BUILD;
+</script>
+<!-- ND-AUDIT-0001: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0002: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0003: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0004: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0005: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0006: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0007: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0008: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0009: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0010: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0011: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0012: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0013: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0014: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0015: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0016: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0017: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0018: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0019: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0020: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0021: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0022: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0023: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0024: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0025: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0026: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0027: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0028: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0029: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0030: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0031: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0032: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0033: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0034: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0035: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0036: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0037: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0038: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0039: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0040: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0041: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0042: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0043: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0044: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0045: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0046: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0047: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0048: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0049: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0050: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0051: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0052: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0053: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0054: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0055: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0056: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0057: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0058: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0059: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0060: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0061: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0062: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0063: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0064: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0065: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0066: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0067: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0068: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0069: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0070: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0071: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0072: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0073: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0074: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0075: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0076: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0077: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0078: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0079: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0080: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0081: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0082: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0083: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0084: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0085: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0086: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0087: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0088: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0089: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0090: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0091: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0092: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0093: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0094: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0095: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0096: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0097: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0098: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0099: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0100: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0101: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0102: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0103: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0104: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0105: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0106: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0107: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0108: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0109: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0110: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0111: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0112: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0113: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0114: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0115: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0116: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0117: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0118: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0119: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0120: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0121: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0122: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0123: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0124: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0125: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0126: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0127: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0128: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0129: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0130: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0131: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0132: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0133: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0134: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0135: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0136: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0137: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0138: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0139: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0140: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0141: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0142: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0143: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0144: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0145: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0146: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0147: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0148: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0149: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0150: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0151: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0152: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0153: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0154: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0155: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0156: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0157: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0158: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0159: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0160: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0161: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0162: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0163: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0164: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0165: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0166: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0167: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0168: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0169: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0170: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0171: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0172: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0173: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0174: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0175: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0176: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0177: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0178: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0179: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0180: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0181: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0182: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0183: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0184: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0185: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0186: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0187: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0188: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0189: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0190: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0191: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0192: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0193: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0194: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0195: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0196: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0197: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0198: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0199: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0200: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0201: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0202: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0203: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0204: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0205: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0206: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0207: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0208: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0209: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0210: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0211: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0212: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0213: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0214: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0215: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0216: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0217: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0218: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0219: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0220: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0221: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0222: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0223: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0224: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0225: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0226: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0227: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0228: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0229: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0230: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0231: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0232: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0233: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0234: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0235: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0236: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0237: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0238: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0239: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0240: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0241: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0242: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0243: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0244: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0245: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0246: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0247: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0248: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0249: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0250: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0251: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0252: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0253: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0254: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0255: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0256: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0257: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0258: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0259: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0260: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0261: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0262: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0263: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0264: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0265: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0266: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0267: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0268: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0269: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0270: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0271: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0272: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0273: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0274: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0275: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0276: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0277: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0278: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0279: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0280: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0281: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0282: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0283: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0284: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0285: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0286: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0287: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0288: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0289: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0290: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0291: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0292: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0293: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0294: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0295: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0296: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0297: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0298: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0299: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0300: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0301: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0302: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0303: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0304: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0305: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0306: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0307: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0308: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0309: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0310: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0311: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0312: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0313: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0314: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0315: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0316: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0317: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0318: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0319: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0320: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0321: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0322: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0323: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0324: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0325: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0326: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0327: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0328: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0329: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0330: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0331: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0332: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0333: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0334: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0335: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0336: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0337: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0338: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0339: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0340: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0341: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0342: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0343: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0344: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0345: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0346: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0347: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0348: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0349: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0350: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0351: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0352: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0353: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0354: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0355: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0356: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0357: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0358: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0359: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0360: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0361: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0362: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0363: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0364: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0365: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0366: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0367: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0368: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0369: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0370: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0371: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0372: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0373: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0374: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0375: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0376: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0377: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0378: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0379: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0380: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0381: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0382: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0383: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0384: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0385: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0386: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0387: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0388: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0389: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0390: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0391: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0392: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0393: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0394: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0395: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0396: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0397: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0398: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0399: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0400: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0401: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0402: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0403: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0404: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0405: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0406: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0407: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0408: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0409: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0410: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0411: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0412: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0413: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0414: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0415: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0416: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0417: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0418: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0419: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0420: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0421: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0422: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0423: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0424: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0425: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0426: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0427: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0428: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0429: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0430: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0431: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0432: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0433: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0434: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0435: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0436: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0437: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0438: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0439: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0440: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0441: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0442: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0443: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0444: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0445: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0446: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0447: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0448: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0449: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0450: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0451: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0452: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0453: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0454: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0455: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0456: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0457: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0458: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0459: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0460: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0461: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0462: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0463: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0464: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0465: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0466: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0467: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0468: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0469: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0470: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0471: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0472: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0473: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0474: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0475: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0476: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0477: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0478: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0479: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0480: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0481: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0482: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0483: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0484: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0485: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0486: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0487: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0488: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0489: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0490: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0491: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0492: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0493: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0494: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0495: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0496: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0497: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0498: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0499: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0500: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0501: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0502: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0503: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0504: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0505: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0506: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0507: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0508: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0509: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0510: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0511: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0512: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0513: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0514: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0515: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0516: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0517: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0518: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0519: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0520: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0521: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0522: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0523: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0524: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0525: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0526: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0527: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0528: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0529: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0530: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0531: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0532: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0533: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0534: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0535: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0536: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0537: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0538: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0539: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0540: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0541: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0542: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0543: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0544: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0545: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0546: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0547: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0548: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0549: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0550: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0551: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0552: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0553: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0554: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0555: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0556: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0557: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0558: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0559: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0560: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0561: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0562: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0563: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0564: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0565: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0566: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0567: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0568: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0569: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0570: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0571: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0572: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0573: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0574: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0575: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0576: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0577: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0578: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0579: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0580: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0581: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0582: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0583: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0584: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0585: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0586: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0587: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0588: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0589: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0590: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0591: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0592: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0593: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0594: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0595: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0596: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0597: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0598: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0599: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0600: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0601: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0602: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0603: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0604: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0605: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0606: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0607: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0608: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0609: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0610: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0611: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0612: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0613: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0614: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0615: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0616: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0617: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0618: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0619: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0620: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0621: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0622: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0623: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0624: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0625: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0626: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0627: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0628: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0629: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0630: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0631: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0632: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0633: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0634: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0635: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0636: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0637: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0638: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0639: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0640: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0641: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0642: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0643: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0644: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0645: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0646: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0647: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0648: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0649: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0650: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0651: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0652: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0653: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0654: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0655: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0656: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0657: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0658: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0659: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0660: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0661: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0662: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0663: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0664: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0665: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0666: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0667: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0668: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0669: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0670: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0671: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0672: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0673: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0674: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0675: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0676: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0677: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0678: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0679: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0680: Errors are surfaced to the user instead of silently failing. -->
+<!-- ND-AUDIT-0681: Never trust client-provided Gem balances; Supabase is authoritative. -->
+<!-- ND-AUDIT-0682: Never calculate Dice winners in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0683: Never calculate Upgrader win/loss in the browser; use a server RPC. -->
+<!-- ND-AUDIT-0684: Roblox verification challenges must be created server-side and expire. -->
+<!-- ND-AUDIT-0685: Owner privileges must be based on immutable Supabase authorization, not display names alone. -->
+<!-- ND-AUDIT-0686: The Owner username additionally requires the supplied Supabase UID during login. -->
+<!-- ND-AUDIT-0687: No service-role key, database password, or secret belongs in this HTML file. -->
+<!-- ND-AUDIT-0688: Inventory currency rows named Spielpunkte/Game Points/Gems are filtered from pet inventory. -->
+<!-- ND-AUDIT-0689: Gems are displayed as a diamond currency card and selected with a numeric input. -->
+<!-- ND-AUDIT-0690: Join validation only checks that available Gems are at least the required stake. -->
+<!-- ND-AUDIT-0691: Having more Gems than a lobby stake must never block joining. -->
+<!-- ND-AUDIT-0692: Chat message text is inserted with textContent and is not executed as HTML. -->
+<!-- ND-AUDIT-0693: Clicking a chat username opens the profile/gift modal. -->
+<!-- ND-AUDIT-0694: Gift actions are sent to a server-side RPC and must be atomic. -->
+<!-- ND-AUDIT-0695: Rank thresholds are 1M, 10M, 100M, and 1B total wagered Gems. -->
+<!-- ND-AUDIT-0696: Logged-in users see their profile card instead of the login form. -->
+<!-- ND-AUDIT-0697: Profile rendering supports Roblox avatar URL, games, wins, winrate, Gems and wagered Gems. -->
+<!-- ND-AUDIT-0698: The frontend uses the supplied public Supabase project URL and publishable key. -->
+<!-- ND-AUDIT-0699: Fallback names exist only for compatibility with older NeonDice schemas. -->
+<!-- ND-AUDIT-0700: Errors are surfaced to the user instead of silently failing. -->
+</body>
+</html>
