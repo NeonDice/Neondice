@@ -1,0 +1,2518 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NeonDice</title>
+<style>
+:root{--bg:#070812;--panel:#0f1120;--panel2:#14172a;--line:#29234b;--purple:#8b5cf6;--purple2:#c084fc;--text:#f5f3ff;--muted:#a7a4bd;--good:#34d399;--danger:#fb7185}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{background:radial-gradient(circle at 50% -10%,#34205b 0,#10101d 34%,var(--bg) 70%)}
+button,input{font:inherit}button{border:0;color:#fff;cursor:pointer}.app{display:grid;grid-template-columns:220px minmax(0,1fr) 310px;min-height:100vh}
+aside{padding:28px 18px;border-right:1px solid #24243a;background:#080a13}.logo{font-weight:900;font-size:24px;margin:4px 14px 34px}.logo span{color:var(--purple2)}
+nav{display:grid;gap:10px}nav button{background:#111323;border:1px solid transparent;border-radius:12px;text-align:left;padding:13px 15px}nav button.active,nav button:hover{background:#1b1930;border-color:#46317b}
+.content{padding:28px 34px;max-width:1150px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px}.top h1{margin:0 0 5px}
+.status{font-size:13px;color:var(--muted)}.dot{display:inline-block;width:9px;height:9px;background:var(--good);border-radius:50%;margin-right:6px}
+.card{background:linear-gradient(145deg,#141628,#0e101d);border:1px solid var(--line);border-radius:20px;padding:22px;margin-bottom:18px;box-shadow:0 12px 40px #0004}
+.btn{background:linear-gradient(135deg,#8b5cf6,#6d43d8);padding:11px 17px;border-radius:12px;font-weight:800}.btn.secondary{background:#1b1a2d;border:1px solid #3a315f}.btn.danger{background:#401b2b;border:1px solid #6b263d}.actions{display:flex;gap:10px;flex-wrap:wrap}
+.profile-btn{display:flex;align-items:center;gap:9px;background:#121426;border:1px solid #39315c;padding:8px 12px;border-radius:13px}.mini-avatar{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#8b5cf6,#f0abfc);font-weight:900}
+.lang{background:#121426;border:1px solid #39315c;border-radius:11px;padding:9px 12px}.top-actions{display:flex;align-items:center;gap:8px}
+.hero{min-height:500px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative;overflow:hidden}.hero.empty{background:linear-gradient(#090b16aa,#090b16dd),url("https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1600&q=70") center/cover}
+.hero.empty:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 35%,#7c3aed33,transparent 50%)}.hero>*{position:relative;z-index:1}
+.hero-title{font-size:clamp(30px,5vw,52px);font-weight:950;letter-spacing:-1px}.hero-sub{max-width:650px;color:#c8c4d9;line-height:1.6}.balance{font-weight:900;color:#c4a7ff}
+.battle{width:100%;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;margin-top:30px}.player-side{display:flex;flex-direction:column;align-items:center;min-width:0}.avatar{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#8b5cf6,#f0abfc);font-size:25px}.battle-avatar{margin-bottom:10px}.player-name{font-weight:800;font-size:16px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dice-row{display:flex;gap:10px;margin-top:16px}.small-die{width:58px;height:58px;display:grid;place-items:center;border-radius:14px;background:#17132a;border:2px solid #7044c9;color:white;font-size:28px;font-weight:900}.small-die.rolled{background:linear-gradient(135deg,#8b5cf6,#6335d2);border-color:#b084ff}.sum{margin-top:9px;font-weight:800;color:#c4a7ff}.vs{font-size:18px;font-weight:900;color:#c084fc}.winner{margin-top:18px;padding:12px 18px;border-radius:14px;background:#1d1830;border:1px solid #6540a9;font-weight:900;font-size:18px}
+.games,.history,.items{display:grid;gap:12px}.game{display:grid;grid-template-columns:1fr auto;gap:15px;align-items:center}.game h3{margin:0 0 6px}.meta,.small{color:var(--muted);font-size:13px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px}.item{padding:18px;border-radius:16px;background:#111323;border:1px solid #292546}.item strong{display:block;font-size:17px;margin-bottom:6px}.item.selected{border-color:#a77bff;box-shadow:0 0 0 1px #8b5cf655;background:#18132b}.item-head{display:flex;justify-content:space-between;gap:8px}.check{width:20px;height:20px;accent-color:var(--purple)}
+.hidden{display:none!important}.notice{padding:12px;border-radius:12px;background:#241a38;border:1px solid #49326d;color:#d9ccf5;margin-bottom:14px}
+.input{width:100%;background:#0e101d;border:1px solid #302c50;color:white;border-radius:11px;padding:12px;outline:none}.input:focus{border-color:#7951cf}
+.create-step{display:grid;gap:16px}.stake-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}.stepper{display:flex;align-items:center;gap:8px}.stepper button{width:40px;height:40px;border-radius:10px;background:#1b1a2d;border:1px solid #3a315f;font-size:20px}.stake-value{min-width:110px;text-align:center;font-weight:900;color:#c4a7ff}
+.chat{border-left:1px solid #24243a;background:#090b14;padding:24px;display:flex;flex-direction:column}.chat h2{margin-top:0}.messages{flex:1;overflow:auto;min-height:300px;max-height:calc(100vh - 170px);display:flex;flex-direction:column;gap:9px}.msg{background:#131528;border:1px solid #242542;border-radius:12px;padding:9px 11px}.msg b{color:#c4a7ff;font-size:12px}.msg p{margin:4px 0 0;word-break:break-word}.chatform{display:flex;gap:7px;margin-top:12px}
+.profile{display:flex;gap:15px;align-items:center}.history-item{padding:13px;border:1px solid #292546;border-radius:13px;background:#111323}.win{color:var(--good)}.loss{color:var(--danger)}.auth-box{max-width:520px;margin:30px auto}.divider{height:1px;background:#292546;margin:20px 0}
+@media(max-width:1050px){.app{grid-template-columns:190px minmax(0,1fr)}.chat{display:none}}
+@media(max-width:700px){.app{display:block}aside{position:sticky;top:0;z-index:10;border-right:0;border-bottom:1px solid #24243a;padding:10px}.logo{margin:5px;text-align:center;font-size:19px}nav{grid-template-columns:repeat(4,1fr)}nav button{font-size:12px;text-align:center;padding:10px 5px}.content{padding:15px}.top h1{font-size:22px}.top-actions{gap:5px}.profile-btn{padding:6px 8px}.profile-btn span:last-child{display:none}.hero{min-height:420px}.game{grid-template-columns:1fr}.battle{gap:7px}.small-die{width:48px;height:48px;font-size:23px}.player-name{max-width:105px;font-size:14px}.vs{font-size:15px}.stake-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+<div class="logo">NEON<span>DICE</span></div>
+<nav>
+<button class="active" data-page="dice">🎲 <span data-i18n="dice">Dice</span></button>
+<button data-page="create">🎮 <span data-i18n="create">Create</span></button>
+<button data-page="inventory">🎒 <span data-i18n="inventory">Inventory</span></button>
+<button data-page="profile">👤 <span data-i18n="profile">Profile</span></button>
+</nav>
+</aside>
+
+<main class="content">
+<div class="top">
+<div><h1 id="title">Two Dice Battle</h1><div class="status"><span class="dot"></span><span id="connection">Connecting…</span></div></div>
+<div class="top-actions">
+<button class="lang" id="langBtn">EN</button>
+<button class="profile-btn" id="topProfileBtn"><span class="mini-avatar" id="topAvatar">?</span><span id="topProfileText">Login / Profile</span></button>
+</div>
+</div>
+
+<section id="page-dice">
+<div id="hero" class="card hero empty">
+<div class="hero-title" data-i18n="noBets">No active bets</div>
+<div class="hero-sub" data-i18n="noBetsSub">The arena is waiting. Create a match from your inventory or join an open game.</div>
+<div id="balanceTop" class="balance" style="margin-top:10px">Gems: –</div>
+<div class="battle">
+<div class="player-side"><div class="avatar battle-avatar" id="player1Avatar">?</div><div class="player-name" id="player1Name">Ersteller</div><div class="dice-row"><div class="small-die" id="p1d1">?</div><div class="small-die" id="p1d2">?</div></div><div class="sum" id="p1sum">–</div></div>
+<div class="vs">VS</div>
+<div class="player-side"><div class="avatar battle-avatar" id="player2Avatar">?</div><div class="player-name" id="player2Name">Wartet…</div><div class="dice-row"><div class="small-die" id="p2d1">?</div><div class="small-die" id="p2d2">?</div></div><div class="sum" id="p2sum">–</div></div>
+</div>
+<div id="result" class="meta" style="margin-top:25px" data-i18n="chooseLobby">Choose a lobby or create a new match.</div>
+<div class="actions" style="margin-top:14px;text-align:center">
+<button class="btn hidden" id="rollGameButton">🎲 Serverseitig würfeln</button>
+<button class="btn danger hidden" id="cancelGameButton">Match abbrechen</button>
+</div>
+
+</div>
+<div class="card"><h2 data-i18n="openGames">Open games</h2><div id="games" class="games"><div class="small">Loading…</div></div></div>
+</section>
+
+
+<section id="page-create" class="hidden">
+
+<div class="card create-step">
+
+<h2>Match erstellen</h2>
+
+<div id="createLoginNotice" class="notice warn">
+Für ein Match musst du mit Roblox verifiziert sein.
+</div>
+
+<div class="small">
+Wähle Huges aus deinem Supabase-Inventar.
+Der Einsatz wird in Gems angegeben.
+Es gibt keine Spielpunkte mehr.
+</div>
+
+<div class="actions">
+<button class="btn secondary" id="selectAll">
+Alle auswählen
+</button>
+
+<button class="btn secondary" id="clearAll">
+Auswahl löschen
+</button>
+</div>
+
+<div id="createInventory" class="grid"></div>
+
+<div class="divider"></div>
+
+<h2>💎 Gems einsetzen</h2>
+
+<div class="gem-box">
+
+<div>
+<div class="small">Dein Bestand</div>
+<div id="createGemBalance" class="gem-balance">
+💎 –
+</div>
+</div>
+
+<input
+id="gemStakeInput"
+class="input gem-input"
+type="number"
+min="1"
+step="1"
+inputmode="numeric"
+value="1"
+placeholder="Gems"
+>
+
+</div>
+
+<div id="selectedSummary"
+class="small"
+style="margin-top:12px">
+Noch keine Huges ausgewählt.
+</div>
+
+<div id="createError"
+class="notice hidden">
+</div>
+
+<button
+class="btn"
+id="createGame">
+Match erstellen
+</button>
+
+</div>
+
+</section>
+
+<section id="page-inventory" class="hidden">
+<div class="card"><h2 data-i18n="inventoryTitle">Inventory</h2><div id="inventory" class="grid"></div></div>
+</section>
+
+
+<section id="page-profile" class="hidden">
+
+<div id="profileLoginCard" class="card auth-box">
+
+<h2>👤 Roblox Login</h2>
+
+<p class="small">
+Gib deinen Roblox-Benutzernamen ein und erzeuge deinen persönlichen
+10-Buchstaben-Code. Kopiere ihn in deine Roblox-Bio und prüfe danach
+die Bio. Die eigentliche Verifizierung läuft über die Supabase Edge Function.
+</p>
+
+<div class="form-grid">
+
+<label class="small" for="robloxUsername">
+Roblox Benutzername
+</label>
+
+<input id="robloxUsername"
+class="input"
+maxlength="32"
+autocomplete="off"
+autocapitalize="none"
+spellcheck="false"
+placeholder="Roblox Username">
+
+<div id="ownerUidWrap" class="hidden">
+
+<label class="small" for="ownerUid">
+Owner UID
+</label>
+
+<input id="ownerUid"
+class="input"
+maxlength="100"
+autocomplete="off"
+placeholder="Supabase UID">
+
+<div class="small">
+Für <b>IchDerMeister0</b> ist zusätzlich die hinterlegte Supabase-UID erforderlich.
+</div>
+
+</div>
+
+<button class="btn" id="generateCodeButton">
+Code erzeugen
+</button>
+
+<div id="codeWrap" class="hidden">
+
+<div class="small">Dein Code</div>
+
+<div class="code-row">
+
+<input id="verificationCode"
+class="input code"
+readonly>
+
+<button class="btn secondary"
+id="copyCodeButton"
+type="button">
+Kopieren
+</button>
+
+</div>
+
+<div class="small" style="margin-top:8px">
+Code in die Roblox-Bio kopieren und anschließend die Bio prüfen.
+</div>
+
+</div>
+
+<button class="btn secondary hidden"
+id="verifyRobloxButton"
+type="button">
+Roblox Bio prüfen
+</button>
+
+<div id="loginStatus"
+class="small"
+aria-live="polite">
+</div>
+
+</div>
+
+</div>
+
+<div id="profilePanel" class="card hidden">
+
+<div class="profile">
+
+<div id="avatar" class="avatar">
+N
+</div>
+
+<div>
+
+<h2 id="profileName" style="margin:0">
+Spieler
+</h2>
+
+<div id="profileRoblox" class="small">
+Roblox: –
+</div>
+
+<div id="profileId" class="small"></div>
+
+<div id="profileBalance"
+class="balance"
+style="margin-top:5px">
+💎 Gems: –
+</div>
+
+</div>
+
+</div>
+
+<hr class="divider">
+
+<div class="stat-grid">
+
+<div class="stat">
+<div class="small">💎 Gems</div>
+<strong id="profileGems">–</strong>
+</div>
+
+<div class="stat">
+<div class="small">Gespielt</div>
+<strong id="profileGames">–</strong>
+</div>
+
+<div class="stat">
+<div class="small">Gewonnen</div>
+<strong id="profileWins">–</strong>
+</div>
+
+<div class="stat">
+<div class="small">Winrate</div>
+<strong id="profileWinRate">–</strong>
+</div>
+
+</div>
+
+<div class="divider"></div>
+
+<label class="small" for="username">
+Anzeigename
+</label>
+
+<input id="username"
+class="input"
+maxlength="24"
+placeholder="Username">
+
+<div class="actions" style="margin-top:12px">
+
+<button class="btn"
+id="saveProfile">
+Profil speichern
+</button>
+
+<button class="btn danger"
+id="logoutBtn">
+Abmelden
+</button>
+
+</div>
+
+<div class="divider"></div>
+
+<h2>Meine Spiele</h2>
+
+<div id="history" class="history"></div>
+
+</div>
+
+</section>
+
+</main>
+
+<section class="chat">
+<h2>💬 <span data-i18n="globalChat">Global Chat</span></h2>
+<div id="messages" class="messages"></div>
+<form id="chatForm" class="chatform"><input id="chatInput" class="input" maxlength="300" placeholder="Nachricht…"><button class="btn">➤</button></form>
+</section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+.form-grid{display:grid;gap:10px}
+.auth-box{max-width:620px;margin:20px auto}
+.code-row{display:grid;grid-template-columns:1fr auto;gap:8px}
+.code{letter-spacing:4px;text-align:center;font-weight:900}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat{padding:14px;border-radius:14px;background:#111323;border:1px solid #292546}
+.stat strong{display:block;font-size:20px;margin-top:4px}
+.hidden{display:none!important}
+@media(max-width:760px){
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .code-row{grid-template-columns:1fr}
+}
+</style>
+
+<script>
+"use strict";
+
+/*
+  NEONDICE SUPABASE REPAIR
+  =========================
+
+  1. The old frontend tested GET /rest/v1/ and treated HTTP 401 as
+     "publishable key rejected". That is the wrong health check.
+
+  2. This project has working Data API endpoints. The frontend now
+     tests the real public_chat_messages relation instead.
+
+  3. Profile data uses get_my_neondice_profile_v2.
+
+  4. Inventory data uses get_my_inventory_v2.
+
+  5. Gem matches use the existing server-side RPCs:
+       neondice_create_match
+       neondice_join_gem_game
+       neondice_finish_gem_game
+       neondice_cancel_gem_game
+
+  6. Chat uses:
+       public_chat_messages
+       send_public_chat_message
+
+  7. Roblox login uses the deployed:
+       roblox-code-v2
+       roblox-login-v2
+
+  8. Only the public publishable key is in this file.
+     NEVER put a service-role key into HTML.
+*/
+
+const SUPABASE_URL =
+  "https://dtafhtluycvvisuehphd.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_l2SONE96HDFKPj9Dd02RgA_e7LIB_j0";
+
+const OWNER_USERNAME =
+  "IchDerMeister0";
+
+const OWNER_UID =
+  "59f4e842-b734-40b2-952a-688653500d15";
+
+const ROBLOX_CODE_FUNCTION =
+  "roblox-code-v2";
+
+const ROBLOX_LOGIN_FUNCTION =
+  "roblox-login-v2";
+
+const db =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY,
+    {
+      auth:{
+        persistSession:true,
+        autoRefreshToken:true,
+        detectSessionInUrl:true
+      },
+      global:{
+        headers:{
+          "x-client-info":"neondice-repaired"
+        }
+      }
+    }
+  );
+
+const state={
+  lang:localStorage.getItem("neondice_lang")||"de",
+  page:"dice",
+  session:null,
+  user:null,
+  profile:null,
+  inventory:[],
+  selected:new Set(),
+  currentGame:null,
+  code:"",
+  challengeId:"",
+  codeUsername:"",
+  realtime:null
+};
+
+const $=id=>document.getElementById(id);
+
+function esc(value){
+  return String(value??"").replace(
+    /[&<>"']/g,
+    char=>({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    }[char])
+  );
+}
+
+function formatNumber(value){
+  return Number(value||0).toLocaleString("de-DE");
+}
+
+function loggedIn(){
+  return !!state.user?.id;
+}
+
+function verified(){
+  return !!state.profile?.roblox_verified;
+}
+
+function toast(text){
+  const el=$("toast");
+  if(!el)return;
+
+  el.textContent=text;
+  el.classList.remove("hidden");
+
+  clearTimeout(window.__ndToast);
+
+  window.__ndToast=setTimeout(
+    ()=>el.classList.add("hidden"),
+    3200
+  );
+}
+
+function setConnection(text,ok=false){
+  const el=$("connection");
+  if(!el)return;
+
+  el.textContent=text;
+  el.style.color=ok?"#34d399":"#fb7185";
+}
+
+function showPage(page){
+  [
+    "dice",
+    "create",
+    "inventory",
+    "profile"
+  ].forEach(name=>{
+    const el=$("page-"+name);
+
+    if(el){
+      el.classList.toggle(
+        "hidden",
+        name!==page
+      );
+    }
+  });
+
+  document
+    .querySelectorAll("nav button[data-page]")
+    .forEach(button=>{
+      button.classList.toggle(
+        "active",
+        button.dataset.page===page
+      );
+    });
+
+  state.page=page;
+
+  const titles={
+    dice:"Dice",
+    create:"Match erstellen",
+    inventory:"Inventory",
+    profile:"Profil"
+  };
+
+  $("title").textContent=
+    titles[page]||"NeonDice";
+
+  if(page==="create"){
+    loadInventory()
+      .then(renderCreateInventory);
+    updateCreateAccess();
+  }
+
+  if(page==="inventory"){
+    loadInventory();
+  }
+
+  if(page==="profile"){
+    renderProfile();
+    loadHistory();
+  }
+}
+
+document
+  .querySelectorAll("nav button[data-page]")
+  .forEach(button=>{
+    button.onclick=
+      ()=>showPage(button.dataset.page);
+  });
+
+$("topProfileBtn").onclick=
+  ()=>showPage("profile");
+
+async function testSupabase(){
+  /*
+    IMPORTANT FIX:
+
+    Do NOT call:
+      GET /rest/v1/
+
+    as the API-key health test.
+
+    The project logs showed successful 200 requests to actual tables.
+    This test therefore calls a known public table instead.
+  */
+
+  const {
+    data,
+    error
+  }=await db
+    .from("public_chat_messages")
+    .select("id")
+    .limit(1);
+
+  if(error){
+    throw error;
+  }
+
+  return Array.isArray(data);
+}
+
+async function loadSession(){
+  const {
+    data,
+    error
+  }=await db.auth.getSession();
+
+  if(error){
+    throw error;
+  }
+
+  state.session=
+    data?.session||null;
+
+  state.user=
+    state.session?.user||null;
+}
+
+async function loadProfile(){
+  if(!state.user){
+    state.profile=null;
+
+    renderProfile();
+    updateTop();
+    updateGemUI();
+
+    return;
+  }
+
+  const {
+    data,
+    error
+  }=await db.rpc(
+    "get_my_neondice_profile_v2"
+  );
+
+  if(error){
+    console.error(
+      "get_my_neondice_profile_v2",
+      error
+    );
+
+    state.profile=null;
+
+    renderProfile();
+
+    toast(
+      error.message||
+      "Profil konnte nicht geladen werden."
+    );
+
+    return;
+  }
+
+  state.profile=data||null;
+
+  updateTop();
+  updateGemUI();
+  renderProfile();
+  updateCreateAccess();
+}
+
+function updateTop(){
+  const name=
+    state.profile?.roblox_username||
+    state.profile?.username||
+    "";
+
+  $("topAvatar").textContent=
+    name
+      ? name.charAt(0).toUpperCase()
+      : "?";
+
+  $("topProfileText").textContent=
+    name||
+    "Roblox Login";
+}
+
+function updateGemUI(){
+  const gems=
+    Number(state.profile?.gems||0);
+
+  if($("balanceTop")){
+    $("balanceTop").textContent=
+      "💎 Gems: "+
+      formatNumber(gems);
+  }
+
+  if($("createGemBalance")){
+    $("createGemBalance").textContent=
+      "💎 "+
+      formatNumber(gems);
+  }
+
+  if($("profileBalance")){
+    $("profileBalance").textContent=
+      "💎 Gems: "+
+      formatNumber(gems);
+  }
+
+  if($("profileGems")){
+    $("profileGems").textContent=
+      formatNumber(gems);
+  }
+}
+
+function renderProfile(){
+  const isReady=
+    loggedIn()&&
+    !!state.profile;
+
+  $("profileLoginCard")
+    ?.classList.toggle(
+      "hidden",
+      isReady
+    );
+
+  $("profilePanel")
+    ?.classList.toggle(
+      "hidden",
+      !isReady
+    );
+
+  if(!isReady){
+    updateOwnerField();
+    return;
+  }
+
+  const name=
+    state.profile.roblox_username||
+    state.profile.username||
+    "Spieler";
+
+  $("profileName").textContent=
+    state.profile.username||
+    name;
+
+  $("profileRoblox").textContent=
+    "Roblox: "+
+    (state.profile.roblox_username||"–");
+
+  $("profileId").textContent=
+    "ID: "+
+    String(state.profile.id).slice(0,16)+
+    "…";
+
+  $("avatar").textContent=
+    name.charAt(0).toUpperCase();
+
+  $("username").value=
+    state.profile.username||"";
+
+  $("profileGems").textContent=
+    formatNumber(state.profile.gems);
+
+  $("profileGames").textContent=
+    formatNumber(state.profile.games_played);
+
+  $("profileWins").textContent=
+    formatNumber(state.profile.games_won);
+
+  $("profileWinRate").textContent=
+    Number(
+      state.profile.win_rate||0
+    ).toFixed(2)+"%";
+}
+
+function updateOwnerField(){
+  const input=
+    $("robloxUsername");
+
+  if(!input)return;
+
+  const username=
+    input.value.trim();
+
+  const isOwner=
+    username.toLowerCase()===
+    OWNER_USERNAME.toLowerCase();
+
+  $("ownerUidWrap")
+    ?.classList.toggle(
+      "hidden",
+      !isOwner
+    );
+
+  if(!isOwner&&$("ownerUid")){
+    $("ownerUid").value="";
+  }
+}
+
+async function edgeCall(
+  functionName,
+  payload
+){
+  const response=
+    await fetch(
+      `${SUPABASE_URL}/functions/v1/${functionName}`,
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":
+            "application/json",
+          "apikey":
+            SUPABASE_KEY,
+          "Authorization":
+            "Bearer "+SUPABASE_KEY
+        },
+        body:
+          JSON.stringify(payload)
+      }
+    );
+
+  let data={};
+
+  try{
+    data=await response.json();
+  }catch(_){}
+
+  if(!response.ok){
+    throw new Error(
+      data?.error||
+      `Edge Function HTTP ${response.status}`
+    );
+  }
+
+  return data;
+}
+
+$("robloxUsername")?.addEventListener(
+  "input",
+  updateOwnerField
+);
+
+$("generateCodeButton")?.addEventListener(
+  "click",
+  async()=>{
+    const username=
+      $("robloxUsername")
+        .value
+        .trim();
+
+    const status=
+      $("loginStatus");
+
+    if(!username){
+      status.textContent=
+        "Bitte zuerst den Roblox-Benutzernamen eingeben.";
+      return;
+    }
+
+    if(
+      username.toLowerCase()===
+      OWNER_USERNAME.toLowerCase()
+    ){
+      const ownerUid=
+        $("ownerUid")
+          .value
+          .trim();
+
+      if(!ownerUid){
+        status.textContent=
+          "Für IchDerMeister0 muss zusätzlich die Supabase-UID eingegeben werden.";
+        return;
+      }
+    }
+
+    const button=
+      $("generateCodeButton");
+
+    button.disabled=true;
+
+    status.textContent=
+      "Roblox-Benutzer wird geprüft…";
+
+    try{
+      const data=
+        await edgeCall(
+          ROBLOX_CODE_FUNCTION,
+          {username}
+        );
+
+      if(
+        !data?.ok||
+        !data?.code
+      ){
+        throw new Error(
+          data?.error||
+          "Code konnte nicht erzeugt werden."
+        );
+      }
+
+      state.code=
+        String(data.code)
+          .toUpperCase();
+
+      state.challengeId=
+        String(
+          data.challenge_id||
+          ""
+        );
+
+      state.codeUsername=
+        String(
+          data.username||
+          username
+        );
+
+      $("verificationCode")
+        .value=
+        state.code;
+
+      $("codeWrap")
+        .classList.remove(
+          "hidden"
+        );
+
+      $("verifyRobloxButton")
+        .classList.remove(
+          "hidden"
+        );
+
+      status.textContent=
+        "Code erzeugt. Kopiere ihn in deine Roblox-Bio.";
+
+      toast(
+        "Roblox-Code erzeugt."
+      );
+
+    }catch(error){
+      console.error(
+        "roblox-code-v2",
+        error
+      );
+
+      status.textContent=
+        error.message||
+        "Code konnte nicht erzeugt werden.";
+
+    }finally{
+      button.disabled=false;
+    }
+  }
+);
+
+$("copyCodeButton")?.addEventListener(
+  "click",
+  async()=>{
+    const code=
+      $("verificationCode")
+        .value
+        .trim();
+
+    if(!code)return;
+
+    try{
+      await navigator.clipboard
+        .writeText(code);
+    }catch(_){
+      const input=
+        $("verificationCode");
+
+      input.focus();
+      input.select();
+
+      document.execCommand(
+        "copy"
+      );
+    }
+
+    toast("Code kopiert.");
+  }
+);
+
+$("verifyRobloxButton")?.addEventListener(
+  "click",
+  async()=>{
+    const username=
+      $("robloxUsername")
+        .value
+        .trim();
+
+    const code=
+      state.code||
+      $("verificationCode")
+        .value
+        .trim()
+        .toUpperCase();
+
+    const ownerUid=
+      $("ownerUid")
+        .value
+        .trim();
+
+    const status=
+      $("loginStatus");
+
+    if(!username||!code){
+      status.textContent=
+        "Bitte zuerst einen Code erzeugen.";
+      return;
+    }
+
+    const button=
+      $("verifyRobloxButton");
+
+    button.disabled=true;
+
+    status.textContent=
+      "Roblox-Bio wird geprüft…";
+
+    try{
+      /*
+        roblox-login-v2:
+        - finds the Roblox user
+        - verifies the code against the challenge
+        - checks the Roblox bio
+        - creates/updates the Supabase Auth user
+        - returns temporary login credentials
+      */
+
+      const data=
+        await edgeCall(
+          ROBLOX_LOGIN_FUNCTION,
+          {
+            username,
+            code,
+            challenge_id:
+              state.challengeId,
+            owner_uid:
+              ownerUid
+          }
+        );
+
+      if(!data?.ok){
+        throw new Error(
+          data?.error||
+          "Roblox-Login fehlgeschlagen."
+        );
+      }
+
+      if(
+        !data.email||
+        !data.password
+      ){
+        throw new Error(
+          "Supabase hat keine Login-Daten zurückgegeben."
+        );
+      }
+
+      status.textContent=
+        "Bio bestätigt. Supabase-Session wird erstellt…";
+
+      const {
+        error
+      }=
+        await db.auth
+          .signInWithPassword({
+            email:data.email,
+            password:data.password
+          });
+
+      if(error){
+        throw error;
+      }
+
+      state.code="";
+      state.challengeId="";
+
+      $("codeWrap")
+        .classList.add(
+          "hidden"
+        );
+
+      $("verifyRobloxButton")
+        .classList.add(
+          "hidden"
+        );
+
+      await loadSession();
+      await loadProfile();
+      await loadInventory();
+      await loadGames();
+
+      status.textContent=
+        "✓ Erfolgreich angemeldet.";
+
+      toast(
+        "Roblox-Login erfolgreich."
+      );
+
+      showPage("dice");
+
+    }catch(error){
+      console.error(
+        "roblox-login-v2",
+        error
+      );
+
+      status.textContent=
+        error.message||
+        "Roblox-Bio konnte nicht bestätigt werden.";
+
+    }finally{
+      button.disabled=false;
+    }
+  }
+);
+
+$("logoutBtn")?.addEventListener(
+  "click",
+  async()=>{
+    await db.auth.signOut();
+
+    state.session=null;
+    state.user=null;
+    state.profile=null;
+    state.inventory=[];
+    state.selected.clear();
+    state.currentGame=null;
+
+    renderProfile();
+    updateTop();
+    updateGemUI();
+    renderInventory();
+    renderCreateInventory();
+
+    showPage("dice");
+
+    toast("Abgemeldet.");
+  }
+);
+
+$("saveProfile")?.addEventListener(
+  "click",
+  async()=>{
+    if(!loggedIn()){
+      showPage("profile");
+      return;
+    }
+
+    const username=
+      $("username")
+        .value
+        .trim();
+
+    if(
+      username.length<3||
+      username.length>24
+    ){
+      toast(
+        "Anzeigename muss 3–24 Zeichen haben."
+      );
+      return;
+    }
+
+    const {
+      error
+    }=
+      await db.rpc(
+        "neondice_update_username",
+        {
+          p_username:
+            username
+        }
+      );
+
+    if(error){
+      toast(
+        error.message
+      );
+      return;
+    }
+
+    await loadProfile();
+
+    toast(
+      "Profil gespeichert."
+    );
+  }
+);
+
+async function loadInventory(){
+  if(!loggedIn()){
+    state.inventory=[];
+    renderInventory();
+    renderCreateInventory();
+    return;
+  }
+
+  const {
+    data,
+    error
+  }=
+    await db.rpc(
+      "get_my_inventory_v2"
+    );
+
+  if(error){
+    console.error(
+      "inventory",
+      error
+    );
+
+    state.inventory=[];
+
+    toast(
+      error.message||
+      "Inventar konnte nicht geladen werden."
+    );
+  }else{
+    state.inventory=
+      Array.isArray(data)
+        ? data
+        : [];
+  }
+
+  renderInventory();
+  renderCreateInventory();
+}
+
+function renderInventory(){
+  const box=
+    $("inventory");
+
+  if(!box)return;
+
+  if(!state.inventory.length){
+    box.innerHTML=
+      `<div class="item">
+        <strong>🎒 Keine Items verfügbar</strong>
+        <div class="small">
+          Das Inventar wird direkt aus Supabase geladen.
+        </div>
+      </div>`;
+    return;
+  }
+
+  box.innerHTML=
+    state.inventory
+      .map(item=>`
+        <div class="item">
+
+          <div class="item-head">
+
+            <div class="item-name">
+              <span class="item-icon">🐱</span>
+              <span>
+                ${esc(
+                  item.item_name||
+                  "Huge"
+                )}
+              </span>
+            </div>
+
+          </div>
+
+          <div
+            class="small"
+            style="margin-top:10px"
+          >
+            Menge:
+            ${formatNumber(
+              item.quantity
+            )}
+          </div>
+
+          <div class="small">
+            Gem-Wert:
+            ${formatNumber(
+              item.gem_value
+            )}
+          </div>
+
+          ${
+            item.variant
+              ? `<div class="small">
+                   Variante:
+                   ${esc(item.variant)}
+                 </div>`
+              : ""
+          }
+
+        </div>
+      `)
+      .join("");
+}
+
+function renderCreateInventory(){
+  const box=
+    $("createInventory");
+
+  if(!box)return;
+
+  if(!state.inventory.length){
+    box.innerHTML=
+      `<div class="item">
+        <strong>🎒 Keine Huges verfügbar</strong>
+        <div class="small">
+          Es wurden keine verfügbaren Inventar-Items gefunden.
+        </div>
+      </div>`;
+
+    updateCreateSummary();
+    return;
+  }
+
+  box.innerHTML="";
+
+  state.inventory.forEach(item=>{
+    const id=
+      String(item.id);
+
+    const selected=
+      state.selected.has(id);
+
+    const card=
+      document.createElement(
+        "div"
+      );
+
+    card.className=
+      "item "+
+      (selected?"selected":"");
+
+    card.innerHTML=`
+      <div class="item-head">
+
+        <div class="item-name">
+          <span class="item-icon">🐱</span>
+          <span>
+            ${esc(
+              item.item_name||
+              "Huge"
+            )}
+          </span>
+        </div>
+
+        <input
+          class="check"
+          type="checkbox"
+          ${selected?"checked":""}
+        >
+
+      </div>
+
+      <div
+        class="small"
+        style="margin-top:10px"
+      >
+        Menge:
+        ${formatNumber(
+          item.quantity
+        )}
+      </div>
+
+      <div class="small">
+        Gem-Wert:
+        ${formatNumber(
+          item.gem_value
+        )}
+      </div>
+    `;
+
+    const checkbox=
+      card.querySelector(
+        "input"
+      );
+
+    checkbox.onclick=
+      event=>{
+        event.stopPropagation();
+      };
+
+    checkbox.onchange=
+      ()=>{
+        toggleItem(id);
+      };
+
+    card.onclick=
+      event=>{
+        if(
+          event.target===
+          checkbox
+        ){
+          return;
+        }
+
+        toggleItem(id);
+      };
+
+    box.appendChild(
+      card
+    );
+  });
+
+  updateCreateSummary();
+}
+
+function toggleItem(id){
+  if(
+    state.selected.has(id)
+  ){
+    state.selected.delete(id);
+  }else{
+    state.selected.add(id);
+  }
+
+  renderCreateInventory();
+}
+
+function updateCreateSummary(){
+  const count=
+    state.selected.size;
+
+  $("selectedSummary").textContent=
+    count
+      ? `${count} Huge(s) ausgewählt.`
+      : "Noch keine Huges ausgewählt.";
+}
+
+$("selectAll")?.addEventListener(
+  "click",
+  ()=>{
+    state.selected.clear();
+
+    state.inventory.forEach(
+      item=>{
+        state.selected.add(
+          String(item.id)
+        );
+      }
+    );
+
+    renderCreateInventory();
+  }
+);
+
+$("clearAll")?.addEventListener(
+  "click",
+  ()=>{
+    state.selected.clear();
+    renderCreateInventory();
+  }
+);
+
+function updateCreateAccess(){
+  const ok=
+    verified();
+
+  $("createGame")?.toggleAttribute(
+    "disabled",
+    !ok
+  );
+
+  $("createLoginNotice")
+    ?.classList.toggle(
+      "hidden",
+      ok
+    );
+}
+
+$("createGame")?.addEventListener(
+  "click",
+  createMatch
+);
+
+async function createMatch(){
+  if(!loggedIn()){
+    showPage("profile");
+    return;
+  }
+
+  if(!verified()){
+    toast(
+      "Bitte zuerst Roblox verifizieren."
+    );
+    showPage("profile");
+    return;
+  }
+
+  const ids=
+    Array.from(
+      state.selected
+    )
+    .map(Number)
+    .filter(Number.isFinite);
+
+  const stake=
+    Math.floor(
+      Number(
+        $("gemStakeInput")
+          ?.value||0
+      )
+    );
+
+  const errorBox=
+    $("createError");
+
+  errorBox.classList.add(
+    "hidden"
+  );
+
+  if(!ids.length){
+    errorBox.textContent=
+      "Wähle mindestens ein Huge aus.";
+
+    errorBox.classList.remove(
+      "hidden"
+    );
+
+    return;
+  }
+
+  if(stake<1){
+    errorBox.textContent=
+      "Der Gem-Einsatz muss mindestens 1 sein.";
+
+    errorBox.classList.remove(
+      "hidden"
+    );
+
+    return;
+  }
+
+  if(
+    stake>
+    Number(
+      state.profile?.gems||
+      0
+    )
+  ){
+    errorBox.textContent=
+      "Nicht genügend Gems.";
+
+    errorBox.classList.remove(
+      "hidden"
+    );
+
+    return;
+  }
+
+  const button=
+    $("createGame");
+
+  button.disabled=true;
+
+  try{
+    const {
+      data,
+      error
+    }=
+      await db.rpc(
+        "neondice_create_match",
+        {
+          p_stake:
+            stake,
+          p_inventory_ids:
+            ids
+        }
+      );
+
+    if(error){
+      throw error;
+    }
+
+    state.currentGame=
+      data;
+
+    state.selected.clear();
+
+    $("gemStakeInput").value=
+      "1";
+
+    await loadProfile();
+    await loadInventory();
+    await loadGames();
+
+    renderGame(data);
+    showPage("dice");
+
+    toast(
+      "Match erstellt."
+    );
+
+  }catch(error){
+    console.error(
+      "create match",
+      error
+    );
+
+    errorBox.textContent=
+      error.message||
+      "Match konnte nicht erstellt werden.";
+
+    errorBox.classList.remove(
+      "hidden"
+    );
+
+  }finally{
+    button.disabled=false;
+  }
+}
+
+async function loadGames(){
+  const box=
+    $("games");
+
+  if(!box)return;
+
+  box.innerHTML=
+    `<div class="small">
+      Spiele werden geladen…
+    </div>`;
+
+  const {
+    data,
+    error
+  }=
+    await db
+      .from("games")
+      .select("*")
+      .in(
+        "status",
+        [
+          "open",
+          "ready",
+          "finished"
+        ]
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      )
+      .limit(50);
+
+  if(error){
+    console.error(
+      "games",
+      error
+    );
+
+    box.innerHTML=
+      `<div class="small">
+        ${esc(error.message)}
+      </div>`;
+
+    return;
+  }
+
+  if(!data?.length){
+    box.innerHTML=
+      `<div class="small">
+        Noch keine Spiele.
+      </div>`;
+
+    return;
+  }
+
+  box.innerHTML="";
+
+  data.forEach(
+    game=>{
+      const stake=
+        Number(
+          game.creator_stake??
+          game.stake??
+          0
+        );
+
+      const joined=
+        !!game.player2_id;
+
+      const row=
+        document.createElement(
+          "div"
+        );
+
+      row.className=
+        "card game";
+
+      row.innerHTML=`
+        <div>
+
+          <h3>
+            🎲
+            ${esc(
+              game.name||
+              "NeonDice Match"
+            )}
+          </h3>
+
+          <div class="meta">
+            ${esc(
+              game.player1_name||
+              "Spieler"
+            )}
+            vs
+            ${esc(
+              game.player2_name||
+              "Wartet…"
+            )}
+          </div>
+
+          <div class="small">
+            💎
+            ${formatNumber(stake)}
+            Gems
+          </div>
+
+          <div class="small">
+            Status:
+            ${esc(game.status)}
+          </div>
+
+        </div>
+
+        <div class="actions"></div>
+      `;
+
+      const actions=
+        row.querySelector(
+          ".actions"
+        );
+
+      if(
+        game.status==="open"&&
+        !joined&&
+        game.player1_id!==
+        state.user?.id
+      ){
+        const join=
+          document.createElement(
+            "button"
+          );
+
+        join.className=
+          "btn";
+
+        join.textContent=
+          "Beitreten";
+
+        join.onclick=
+          ()=>joinGame(game);
+
+        actions.appendChild(
+          join
+        );
+      }
+
+      const watch=
+        document.createElement(
+          "button"
+        );
+
+      watch.className=
+        "btn secondary";
+
+      watch.textContent=
+        "Öffnen";
+
+      watch.onclick=
+        ()=>{
+          state.currentGame=
+            game;
+
+          renderGame(
+            game
+          );
+
+          showPage(
+            "dice"
+          );
+        };
+
+      actions.appendChild(
+        watch
+      );
+
+      box.appendChild(
+        row
+      );
+    }
+  );
+}
+
+async function joinGame(game){
+  if(!loggedIn()){
+    showPage("profile");
+    return;
+  }
+
+  if(!verified()){
+    toast(
+      "Bitte zuerst Roblox verifizieren."
+    );
+    showPage("profile");
+    return;
+  }
+
+  const creatorStake=
+    Number(
+      game.creator_stake??
+      game.stake??
+      0
+    );
+
+  const minimum=
+    Math.ceil(
+      creatorStake*
+      0.95
+    );
+
+  const maximum=
+    Math.floor(
+      creatorStake*
+      1.10
+    );
+
+  const gems=
+    Number(
+      state.profile?.gems||
+      0
+    );
+
+  const stake=
+    Math.max(
+      minimum,
+      Math.min(
+        maximum,
+        gems
+      )
+    );
+
+  if(stake<minimum){
+    toast(
+      `Du benötigst mindestens ${formatNumber(minimum)} Gems.`
+    );
+    return;
+  }
+
+  if(
+    !window.confirm(
+      `Für ${formatNumber(stake)} Gems beitreten?`
+    )
+  ){
+    return;
+  }
+
+  const {
+    data,
+    error
+  }=
+    await db.rpc(
+      "neondice_join_gem_game",
+      {
+        p_game_id:
+          game.id,
+        p_stake:
+          stake
+      }
+    );
+
+  if(error){
+    toast(
+      error.message
+    );
+    return;
+  }
+
+  state.currentGame=
+    data;
+
+  await loadProfile();
+  await loadGames();
+
+  renderGame(data);
+
+  toast(
+    "Match beigetreten."
+  );
+}
+
+function setDie(id,value){
+  const el=$(id);
+  if(!el)return;
+
+  el.textContent=
+    value==null
+      ? "?"
+      : value;
+
+  el.classList.toggle(
+    "rolled",
+    value!=null
+  );
+}
+
+function renderGame(game){
+  if(!game)return;
+
+  state.currentGame=
+    game;
+
+  $("player1Name").textContent=
+    game.player1_name||
+    "Ersteller";
+
+  $("player2Name").textContent=
+    game.player2_name||
+    "Wartet…";
+
+  $("player1Avatar").textContent=
+    (
+      game.player1_name||
+      "E"
+    )
+    .charAt(0)
+    .toUpperCase();
+
+  $("player2Avatar").textContent=
+    (
+      game.player2_name||
+      "?"
+    )
+    .charAt(0)
+    .toUpperCase();
+
+  setDie(
+    "p1d1",
+    game.player1_die1
+  );
+
+  setDie(
+    "p1d2",
+    game.player1_die2
+  );
+
+  setDie(
+    "p2d1",
+    game.player2_die1
+  );
+
+  setDie(
+    "p2d2",
+    game.player2_die2
+  );
+
+  $("p1sum").textContent=
+    game.player1_total!=null
+      ? "Summe: "+
+        game.player1_total
+      : "–";
+
+  $("p2sum").textContent=
+    game.player2_total!=null
+      ? "Summe: "+
+        game.player2_total
+      : "–";
+
+  $("rollGameButton")
+    ?.classList.add(
+      "hidden"
+    );
+
+  $("cancelGameButton")
+    ?.classList.add(
+      "hidden"
+    );
+
+  if(game.status==="open"){
+    $("result").textContent=
+      "Warte auf einen zweiten Spieler.";
+
+    if(
+      loggedIn()&&
+      game.player1_id===
+      state.user.id
+    ){
+      $("cancelGameButton")
+        ?.classList.remove(
+          "hidden"
+        );
+    }
+
+    return;
+  }
+
+  if(game.status==="ready"){
+    $("result").textContent=
+      "Match bereit. Der Wurf wird serverseitig ausgeführt.";
+
+    if(
+      loggedIn()&&
+      (
+        game.player1_id===
+        state.user.id||
+        game.player2_id===
+        state.user.id
+      )
+    ){
+      $("rollGameButton")
+        ?.classList.remove(
+          "hidden"
+        );
+    }
+
+    return;
+  }
+
+  if(game.status==="finished"){
+    let winner=
+      "Unentschieden";
+
+    if(
+      game.winner==="creator"||
+      game.winner==="player1"
+    ){
+      winner=
+        game.player1_name||
+        "Ersteller";
+    }
+
+    if(
+      game.winner==="joiner"||
+      game.winner==="player2"
+    ){
+      winner=
+        game.player2_name||
+        "Spieler";
+    }
+
+    if(
+      game.winner==="draw"
+    ){
+      winner=
+        "Unentschieden";
+    }
+
+    $("result").innerHTML=
+      `<div class="winner">
+        🏆 ${esc(winner)}
+      </div>`;
+
+    return;
+  }
+
+  $("result").textContent=
+    "Status: "+
+    String(
+      game.status||
+      "unbekannt"
+    );
+}
+
+$("rollGameButton")?.addEventListener(
+  "click",
+  async()=>{
+    if(!state.currentGame?.id){
+      return;
+    }
+
+    const button=
+      $("rollGameButton");
+
+    button.disabled=true;
+
+    try{
+      const {
+        data,
+        error
+      }=
+        await db.rpc(
+          "neondice_finish_gem_game",
+          {
+            p_game_id:
+              state.currentGame.id
+          }
+        );
+
+      if(error){
+        throw error;
+      }
+
+      state.currentGame=
+        data;
+
+      renderGame(data);
+
+      await loadProfile();
+      await loadGames();
+
+      toast(
+        "Serverseitiger Würfel abgeschlossen."
+      );
+
+    }catch(error){
+      toast(
+        error.message||
+        "Wurf fehlgeschlagen."
+      );
+    }finally{
+      button.disabled=false;
+    }
+  }
+);
+
+$("cancelGameButton")?.addEventListener(
+  "click",
+  async()=>{
+    if(!state.currentGame?.id){
+      return;
+    }
+
+    if(
+      !window.confirm(
+        "Match wirklich abbrechen? Der Gem-Einsatz wird zurückerstattet."
+      )
+    ){
+      return;
+    }
+
+    const {
+      data,
+      error
+    }=
+      await db.rpc(
+        "neondice_cancel_gem_game",
+        {
+          p_game_id:
+            state.currentGame.id
+        }
+      );
+
+    if(error){
+      toast(
+        error.message
+      );
+      return;
+    }
+
+    state.currentGame=
+      data;
+
+    await loadProfile();
+    await loadGames();
+
+    renderGame(
+      data
+    );
+
+    toast(
+      "Match abgebrochen."
+    );
+  }
+);
+
+async function loadHistory(){
+  const box=
+    $("history");
+
+  if(
+    !box||
+    !loggedIn()
+  ){
+    return;
+  }
+
+  const {
+    data,
+    error
+  }=
+    await db
+      .from("games")
+      .select("*")
+      .or(
+        `player1_id.eq.${state.user.id},player2_id.eq.${state.user.id}`
+      )
+      .eq(
+        "status",
+        "finished"
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      )
+      .limit(50);
+
+  if(error){
+    box.innerHTML=
+      `<div class="small">
+        ${esc(error.message)}
+      </div>`;
+    return;
+  }
+
+  if(!data?.length){
+    box.innerHTML=
+      `<div class="small">
+        Noch keine beendeten Spiele.
+      </div>`;
+    return;
+  }
+
+  box.innerHTML=
+    data.map(
+      game=>`
+        <div
+          class="history-item"
+          style="margin-bottom:10px"
+        >
+          <b>
+            ${esc(
+              game.name||
+              "NeonDice Match"
+            )}
+          </b>
+
+          <div class="small">
+            ${esc(
+              game.player1_name||
+              "Spieler"
+            )}
+            vs
+            ${esc(
+              game.player2_name||
+              "Spieler"
+            )}
+          </div>
+
+          <div class="small">
+            💎 Pot:
+            ${formatNumber(game.pot)}
+          </div>
+
+        </div>
+      `
+    ).join("");
+}
+
+async function loadMessages(){
+  const box=
+    $("messages");
+
+  const {
+    data,
+    error
+  }=
+    await db
+      .from(
+        "public_chat_messages"
+      )
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:true
+        }
+      )
+      .limit(150);
+
+  if(error){
+    box.innerHTML=
+      `<div class="small">
+        Chat nicht verfügbar:
+        ${esc(error.message)}
+      </div>`;
+    return;
+  }
+
+  box.innerHTML="";
+
+  (data||[])
+    .forEach(
+      addMessage
+    );
+}
+
+function addMessage(message){
+  const box=
+    $("messages");
+
+  if(!box)return;
+
+  const el=
+    document.createElement(
+      "div"
+    );
+
+  el.className=
+    "msg";
+
+  el.innerHTML=
+    `<b>
+      ${esc(
+        message.username||
+        "Gast"
+      )}
+    </b>
+    <p>
+      ${esc(
+        message.content||
+        ""
+      )}
+    </p>`;
+
+  box.appendChild(
+    el
+  );
+
+  box.scrollTop=
+    box.scrollHeight;
+}
+
+$("chatForm")?.addEventListener(
+  "submit",
+  async event=>{
+    event.preventDefault();
+
+    if(!loggedIn()){
+      showPage(
+        "profile"
+      );
+
+      toast(
+        "Bitte zuerst Roblox anmelden."
+      );
+
+      return;
+    }
+
+    const input=
+      $("chatInput");
+
+    const content=
+      input.value.trim();
+
+    if(!content){
+      return;
+    }
+
+    const {
+      data,
+      error
+    }=
+      await db.rpc(
+        "send_public_chat_message",
+        {
+          p_content:
+            content
+        }
+      );
+
+    if(error){
+      toast(
+        error.message
+      );
+      return;
+    }
+
+    input.value="";
+
+    if(data){
+      addMessage(
+        data
+      );
+    }
+  }
+);
+
+function subscribe(){
+  if(state.realtime){
+    db.removeChannel(
+      state.realtime
+    );
+  }
+
+  state.realtime=
+    db
+      .channel(
+        "neondice-live-repaired"
+      )
+      .on(
+        "postgres_changes",
+        {
+          event:"INSERT",
+          schema:"public",
+          table:"public_chat_messages"
+        },
+        payload=>{
+          addMessage(
+            payload.new
+          );
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event:"*",
+          schema:"public",
+          table:"games"
+        },
+        async payload=>{
+          if(
+            state.currentGame&&
+            payload.new?.id===
+            state.currentGame.id
+          ){
+            state.currentGame=
+              payload.new;
+
+            renderGame(
+              payload.new
+            );
+          }
+
+          await loadGames();
+        }
+      )
+      .subscribe();
+}
+
+db.auth.onAuthStateChange(
+  async(
+    _event,
+    session
+  )=>{
+    state.session=
+      session||null;
+
+    state.user=
+      session?.user||null;
+
+    if(state.user){
+      await loadProfile();
+      await loadInventory();
+      await loadHistory();
+    }else{
+      state.profile=null;
+      state.inventory=[];
+      state.selected.clear();
+
+      renderProfile();
+      renderInventory();
+      renderCreateInventory();
+    }
+
+    updateTop();
+    updateGemUI();
+    updateCreateAccess();
+  }
+);
+
+async function init(){
+  try{
+    await loadSession();
+
+    /*
+      This is the corrected Data API test.
+      It no longer calls /rest/v1/.
+    */
+    await testSupabase();
+
+    setConnection(
+      "SUPABASE ONLINE",
+      true
+    );
+
+    await loadProfile();
+    await loadInventory();
+    await loadGames();
+    await loadMessages();
+
+    subscribe();
+
+  }catch(error){
+    console.error(
+      "NeonDice init:",
+      error
+    );
+
+    setConnection(
+      "SUPABASE FEHLER",
+      false
+    );
+
+    toast(
+      error.message||
+      "Supabase konnte nicht initialisiert werden."
+    );
+  }
+
+  updateTop();
+  updateGemUI();
+  updateCreateAccess();
+  renderProfile();
+}
+
+$("langBtn")?.addEventListener(
+  "click",
+  ()=>{
+    state.lang=
+      state.lang==="de"
+        ? "en"
+        : "de";
+
+    localStorage.setItem(
+      "neondice_lang",
+      state.lang
+    );
+
+    $("langBtn").textContent=
+      state.lang==="de"
+        ? "EN"
+        : "DE";
+  }
+);
+
+showPage("dice");
+
+init();
+
+</script>
+
+
+<div id="toast" class="toast hidden"></div>
+
+</body>
+</html>
